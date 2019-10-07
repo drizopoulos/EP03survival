@@ -1,4 +1,4 @@
-Package: EP03
+Package: EP03Survival
 Type: Package
 Title: Software Tutorials for the Survival Part of the Biostatistical Methods II Course
 Version: 0.2.0
@@ -6,7 +6,7 @@ Date: 2019-10-07
 Author: Dimitris Rizopoulos <d.rizopoulos@erasmusmc.nl>
 Maintainer: Dimitris Rizopoulos <d.rizopoulos@erasmusmc.nl>
 Description: Contains learnr tutorials for the software practicals of the EP03 course.
-Depends: learnr, survival, lattice, splines
+Depends: learnr, survival, lattice, splines, shiny
 Imports: JM
 License: GPL (>= 2)
 Encoding: UTF-8
