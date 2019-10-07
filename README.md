@@ -1,13 +1,13 @@
 # Biostatistical Methods II: Classical Regression Models - Software Practicals Survival
 This repository contains [learnr](https://rstudio.github.io/learnr/) tutorials for the course 
-[**Biostatistical Methods II: Classical Regression Models**](http://www.nihes.com/education/?ct=EP03). 
+[**Biostatistical Methods II: Classical Regression Models**](https://www.nihes.com/course/ep03_biostatistical_methods_ii_classical_regression_models/). 
 The app requires [R](https://cran.r-project.org/) (version >= 3.6.1) and the following 
 packages:
 
-* [survival](https://cran.r-project.org/package=survival) (version >= 2.41-3)
-* [JM](https://cran.r-project.org/package=JM) (version >= 1.4-7)
-* [learnr](https://cran.r-project.org/package=learnr) (version >= 0.9)
-* [lattice](https://cran.r-project.org/package=lattice) (version >= 0.20-35)
+* [survival](https://cran.r-project.org/package=survival) (version >= 2.44-1.1)
+* [JM](https://cran.r-project.org/package=JM) (version >= 1.4-8)
+* [learnr](https://cran.r-project.org/package=learnr) (version >= 0.9.2.1)
+* [lattice](https://cran.r-project.org/package=lattice) (version >= 0.20-38)
 * [splines](https://cran.r-project.org/) (available within base R)
 
 These packages can be installed using the following function call:

@@ -7,5 +7,5 @@ load_practical <- function (name = c("Likelihood", "Basic_Survival", "AFT_Models
                           "AFT_Models" = "Practical3",
                           "Cox_Models" = "Practical4",
                           "Cox_Extensions" = "Practical5")
-    learnr::run_tutorial(name, package = "EP03")
+    learnr::run_tutorial(name, package = "EP03Survival")
 }
