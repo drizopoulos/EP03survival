@@ -1,0 +1,228 @@
+---
+title: "Survival - Practical 1: Features Survival Data, Basic Functions & Tests"
+output: 
+  learnr::tutorial:
+     allow_skip: true
+runtime: shiny_prerendered
+---
+
+```{r setup, include=FALSE}
+library("learnr")
+library("survival")
+data("aids.id", package = "JM")
+knitr::opts_chunk$set(echo = FALSE)
+
+```
+
+
+## Quiz
+
+The following questions test your knowledge in Chapters 1 - 3.
+
+### Question 1
+In a clinical study interest lies on the survival of HIV-infected patients after 
+seroconversion. The Kaplan-Meier estimate at year 1 equals 0.88
+
+```{r Q1}
+quiz(
+  question("Which of the following statements are correct (more than one correct is possible)?",
+    answer("Given that a patient is alive at year 1, the instantaneous risk of death just after year 1 is 0.88."),
+    answer("For the target population and on average we expect 88% of the patients to live more than 1 year.", correct = TRUE),
+    answer("The cumulative risk of death at year 1 equals 0.88."),
+    answer("The estimated survival function at year 1 equals 0.88, meaning that we expect 12% of the patients to die within 1 year.", correct = TRUE),
+    answer("The estimated survival function at year 1 equals 0.12, meaning that we expect 12% of the patients to live more than 1 year."),
+    answer("The cumulative distribution function equals 0.12.", correct = TRUE),
+    answer("The cumulative distribution function equals 0.88."),
+    allow_retry = TRUE, random_answer_order = TRUE
+  )
+)
+```
+
+### Question 2
+
+A study has been designed to investigate whether a new therapy improves the survival rates
+of advanced cancer patients. You have at hand the survival times of the two groups of 
+patients, namely, the patients taking the new treatment and the patients with the standard
+treatment.
+
+```{r Q2}
+quiz(
+  question("Which of the following types of analysis would you follow to investigate if the new treatment works?",
+    answer("Perform a two-sample t-test for the two groups of patients to test if the average survival time in the new treatment group is greater than the average survival time in the standard treatment group."),
+    answer("First check if the data are normally distributes; if yes, perform a two-sample t-test, otherwise perform a two-sample Wilcoxon test to test differences in the medians between the two treatment groups."),
+    answer("Perform a log-rank test to compare the survival distributions of the two groups.", correct = TRUE),
+    answer("Perform a paired t-test for the two groups of patients."),
+    allow_retry = TRUE, random_answer_order = TRUE
+  )
+)
+```
+
+### Question 3
+
+A study has been designed to investigate whether a new therapy improves the survival rates of advanced cancer patients. You have at hand the survival times of the two groups of patients, namely, the patients taking the new treatment and the patients with the standard treatment.
+
+```{r Q3}
+quiz(
+  question("Which of the following types of analysis would you follow to investigate if the new treatment works?",
+    answer("Perform a log-rank test to compare the survival distributions of the two groups."),
+    answer("Perform a Peto and Peto Gehan-Wilcoxon test to compare the survival distributions of the two groups."),
+    answer("Check graphically if the proportional hazards assumption is satisfied. If it seems to be satisfied, then use the log rank test.", correct = TRUE),
+    answer("Check graphically if the proportional hazards assumption is satisfied. If it seems to be satisfied, then use the Peto and Peto Gehan-Wilcoxon test."),
+    allow_retry = TRUE, random_answer_order = TRUE
+  )
+)
+```
+
+
+## Exercises
+
+The purpose of this practical is to illustrate how standard statistical analysis of 
+survival data can be performed in R.
+
+The following questions are based on the AIDS dataset. This dataset is available as the 
+object `aids.id` and is already loaded in this session. From this dataset we will use the 
+following variables:
+
+- `Time`: the observed time-to-death in months.
+
+- `death`: the event indicator; '1' denotes death and '0' censored observation.
+
+- `drug`: the treatment indicator with values 'ddC' and 'ddI'.
+
+- `gender`: the sex indicator with values 'male' and 'female'.
+
+For the exercises below it will be rather useful to check the corresponding sections of the
+[Survival Analysis in R Companion](http://www.drizopoulos.com/courses/EMC/EP03_%20Survival%20Analysis%20in%20R%20Companion.html) that are given in the hints.
+
+### Question 1
+
+Calculate and plot the Kaplan-Meier estimator of the survival function based on all the
+data. What is the median survival time and its 95% confidence interval?
+
+```{r P1, exercise=TRUE, exercise.lines = 10}
+
+```
+
+```{r P1-hint-1}
+# Check the example in slides 73-74, and Section 2.1, Survival Analysis in R Companion
+```
+```{r P1-hint-2}
+# Calculate the Kaplan-Meier estimator and check the output
+fitKM <- survfit(Surv(Time, death) ~ 1, data = aids.id)
+fitKM
+```
+```{r P1-hint-3}
+# Plot the Kaplan-Meier estimator
+plot(fitKM)
+```
+
+### Question 2
+
+Calculate and plot the Breslow estimators of the survival functions for ddC and ddI, 
+separately. Calculate also the estimates of the 50%, 60% and 70% percentiles of the 
+survival distribution with their 95% confidence intervals. Name the Breslow estimator 
+object `fitB`.
+
+```{r P2, exercise=TRUE, exercise.lines = 10}
+
+```
+
+```{r P2-hint-1}
+# Check the example in slides 86 & 80, and Section 2.1, Survival Analysis in R Companion
+```
+
+```{r P2-hint-2}
+# Calculate the Breslow estimator and check the output
+fitB <- survfit(Surv(Time, death) ~ drug, data = aids.id, type = "fleming-harrington")
+fitB
+```
+```{r P2-hint-3}
+# Plot the Breslow estimator
+plot(fitB, lty = 1:2, col = 1:2)
+```
+```{r P2-hint-4}
+# Use the quantile() function
+quantile(fitB, 1 - c(0.5, 0.6, 0.7))
+```
+
+### Question 3
+
+Using the Breslow estimator `fitB` of the previous question, calculate the 8- and 10-month 
+survival probability with its corresponding 95% confidence interval.
+
+```{r P3-setup}
+fitB <- survfit(Surv(Time, death) ~ drug, data = aids.id, type = "fleming-harrington")
+```
+
+```{r P3, exercise=TRUE, exercise.lines = 10}
+
+```
+
+```{r P3-hint-1}
+# You will need to use function summary() and its argument 'times'
+# Check Section 2.1, Survival Analysis in R Companion
+```
+
+```{r P3-hint-2}
+# The code is:
+summary(fitB, times = c(8, 10))
+```
+
+### Question 4
+
+Compare with the log-rank Peto & Peto modified Gehan-Wilcoxon tests if the survival curves
+for the two treatment groups differ statistically significantly. **Before** doing the 
+analysis, which of the two tests you expect to yield the smaller p-value and why?
+
+```{r P4, exercise=TRUE, exercise.lines = 10}
+
+```
+
+```{r P4-hint-1}
+# Check the example in slides 101 & 109, and Section 2.2, Survival Analysis in R Companion
+```
+
+```{r P4-hint-2}
+# log-rank test
+survdiff(Surv(Time, death) ~ drug, data = aids.id)
+```
+```{r P4-hint-3}
+# Gehan-Wilcoxon test
+survdiff(Surv(Time, death) ~ drug, data = aids.id, rho = 1)
+```
+
+
+### Question 5
+
+Do the same for gender, i.e., calculate the Kaplan-Meier estimators of the 
+survival functions for males and females, and compare the results from the log-rank Peto 
+& Peto modified Gehan-Wilcoxon tests. Which test you should trust more in this case and why?
+
+```{r P5, exercise=TRUE, exercise.lines = 10}
+
+```
+
+```{r P5-hint-1}
+# first calculate the Kaplan-Meier estimator and do the graph
+```
+
+```{r P5-hint-2}
+# The code is:
+fitKM_gender <- survfit(Surv(Time, death) ~ gender, data = aids.id)
+fitKM_gender
+
+plot(fitKM_gender)
+```
+
+```{r P5-hint-3}
+# Use survdiff() as in Question 4
+```
+
+```{r P5-hint-4}
+# log-rank test
+survdiff(Surv(Time, death) ~ gender, data = aids.id)
+```
+```{r P5-hint-5}
+# Gehan-Wilcoxon test
+survdiff(Surv(Time, death) ~ gender, data = aids.id, rho = 1)
+```

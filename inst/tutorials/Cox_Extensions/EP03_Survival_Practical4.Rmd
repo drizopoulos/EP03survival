@@ -1,0 +1,438 @@
+---
+title: "Survival - Practical 4: Cox PH Models Extensions"
+output: 
+  learnr::tutorial:
+     allow_skip: true
+runtime: shiny_prerendered
+---
+
+```{r setup, include=FALSE}
+library("learnr")
+library("survival")
+library("lattice")
+library("splines")
+data("lung", package = "survival")
+lung$sex <- factor(lung$sex, labels = c("male", "female"))
+lung <- with(lung, lung[complete.cases(time, status, sex, age, ph.karno), ])
+knitr::opts_chunk$set(echo = FALSE)
+
+```
+
+
+## Quiz
+
+The following questions test your knowledge in the extension of Cox proportional hazards 
+models presented in Chapter 5.
+
+### Question 1
+
+```{r Q1}
+quiz(
+  question("Why do we need the Breslow estimator to calculate survival probabilities from a Cox model (more than one correct possible)?",
+    answer("Because the Cox model does not estimate the baseline hazard.", correct = TRUE),
+    answer("Because the Cox model does not make an assumption for the distribution of the survival times.", correct = TRUE),
+    answer("Because the Cox model makes the proportional hazards assumption."),
+    answer("Because the Cox model does not make an assumption for the form of the baseline hazard.", correct = TRUE),
+    allow_retry = TRUE, random_answer_order = TRUE
+  )
+)
+```
+
+### Question 2
+
+```{r Q2}
+quiz(
+  question("Which of the following statements represent reasons to use a stratified Cox model (more than one correct possible)?",
+    answer("To account for categorical covariates that does not satisfy PH.", correct = TRUE),
+    answer("To account for continuous covariates that does not satisfy PH."),
+    answer("To account for categorical covariates that are time-varying."),
+    answer("To account for continuous covariates that are time-varying"),
+    answer("To account for heterogeneity caused by categorical covariates.", correct = TRUE),
+    answer("To account for heterogeneity caused by continuous covariates.", correct = TRUE),
+    allow_retry = TRUE, random_answer_order = TRUE
+  )
+)
+```
+
+### Question 3
+
+```{r Q3}
+quiz(
+  question("Which of the following represent endogenous time-varying covariates (more than one correct possible)?",
+    answer("Prostate-specific antigen levels for prostate cancer patients.", correct = TRUE),
+    answer("Type of nurse that treats the patients."),
+    answer("Type of hospital (university or not) visited by the patient."),
+    answer("Aortic gradient values of patient who received an aortic valve transplantation.", correct = TRUE),
+    allow_retry = TRUE, random_answer_order = TRUE
+  )
+)
+```
+
+### Question 4
+A randomized study has been performed to assess the efficacy and safety of a new drug for 
+AIDS. Patients were randomized either to the new drug or to the standard treatment, and 
+the primary outcome was time to death. We have collected data from 55 different centers 
+and we would like to test whether the new treatment significantly prolongs survival over 
+all the centers (i.e., we want the pooled effect). Relatively few deaths have been 
+recorded during follow-up, and in some centers we did not have any event.
+
+```{r Q4}
+quiz(
+  question("Which of the following types of analysis would you follow?",
+    answer("A Cox model that includes as covariate the treatment indicator."),
+    answer("A Cox model that includes as covariate the treatment indicator, but with corrected standard errors taking into account that we have data for different centers.", correct = TRUE),
+    answer("A Cox model that includes as covariate the treatment indicator, and a frailty term for center."),
+    answer("A Cox model that includes as covariates the treatment indicator and the center indicator."),
+    allow_retry = TRUE, random_answer_order = TRUE
+  )
+)
+```
+
+### Question 5
+
+In a study on HIV infected patients we are interested in the time until they develop AIDS.
+However, some patients die before an AIDS diagnosis for reasons related to their 
+condition. We would like to estimate the survival function for the time to AIDS, while 
+accounting for these deaths. 
+
+```{r Q5}
+quiz(
+  question("Which of the following options would you choose?",
+    answer("A non-parametric estimator of the cumulative incidence functions for the time to AIDS accounting for competing risks.", correct = TRUE),
+    answer("The Kaplan-Meier estimator of the survival function for the time to AIDS, treating patient who died as censored."),
+    answer("Fit a Cox model for the time to AIDS, treating patients who died as censored. Use the Breslow estimator to derive an estimate of the survival function for the time to AIDS."),
+    answer("Fit an AFT model for the time to AIDS, treating patients who died as censored. Use the Breslow estimator to derive an estimate of the survival function for the time to AIDS."),
+    allow_retry = TRUE, random_answer_order = TRUE
+  )
+)
+```
+
+## Exercises
+
+The purpose of these exercises is to illustrate how to a representative Cox PH regression 
+analysis including the extensions seen in the last sections of Chapter 4 and in Chapter 5.
+
+The following questions are based on the Lung data set. This data set is available as 
+the object `lung` from package **survival**, which is already loaded in this session. 
+From this data set we will use the following variables:
+
+- `time`: the observed time-to-death in days.
+
+- `status`: the event indicator; '1' denotes censored and '2' denotes death.
+
+- `age`: the age in years.
+
+- `ph.karno`: Karnofsky performance score rated by the physician.
+
+- `sex`: the sex indicator with values 'male' and 'female'.
+
+- `ph.ecog`: ECOG performance score (0=good 5=dead).
+
+For the exercises below it will be rather useful to check the corresponding sections of the
+[Survival Analysis in R Companion](http://www.drizopoulos.com/courses/EMC/EP03_%20Survival%20Analysis%20in%20R%20Companion.html) that are given in the hints.
+
+### Question 1
+
+Our initial hypothesis is that the time-to-death is affected by `sex`, `age` and 
+`ph.karno`. In addition, the physicians believe that the effect of `ph.karno` and `age` 
+may be nonlinear in the log-hazard scale. Moreover, the (possibly nonlinear -- model using
+natural cubic splines with 3 degrees of freedom) effects of  `age` and `ph.karno` on the 
+log-hazard scale are not the same for males and females. Transform this initial hypothesis
+into a suitable Cox PH model. Name the fitted model `fit1`.
+
+The aim here is to do a realistic analysis of a survival dataset with a Cox PH model. Hence,
+
+a. Start by checking if the interaction effects can be dropped using a likelihood ratio test.
+
+b. Similarly check if the nonlinear effects can be dropped using a likelihood ratio test.
+
+c. For the final model check the PH assumption for the terms in the model.
+
+```{r P1, exercise=TRUE, exercise.lines = 20}
+
+```
+
+```{r P1-hint-1}
+# Check the examples in slides 191 & 262-263, and 
+# Section 4.1, Survival Analysis in R Companion
+
+# Fit the Cox PH model with nonlinear and interaction effects
+```
+```{r P1-hint-2}
+# The code is (this code only fits the model and does not produce any output):
+fit1 <- coxph(Surv(time, status) ~ sex * (ns(age, 3) + ns(ph.karno, 3)), 
+              data = lung)
+```
+
+```{r P1-hint-3}
+# Fit the Cox PH model without the interaction effects and do the LRT
+# using anova()
+```
+```{r P1-hint-4}
+# The code is
+fit2 <- coxph(Surv(time, status) ~ sex + ns(age, 3) + ns(ph.karno, 3), 
+              data = lung)
+
+anova(fit2, fit1)
+```
+
+```{r P1-hint-5}
+# Fit the Cox PH model without the nonlinear effects and do the LRT
+# Compare this model versus the full model that you initially fitted
+```
+```{r P1-hint-6}
+# The code is
+fit3 <- coxph(Surv(time, status) ~ sex * (age + ph.karno), 
+              data = lung)
+
+anova(fit3, fit1)
+```
+
+```{r P1-hint-7}
+# Based on the results of the previous two tests decide how to simplify the model
+
+# Fit the final model fit4
+```
+```{r P1-hint-8}
+# The final model is (this code only fits the model and does not produce any output):
+fit4 <- coxph(Surv(time, status) ~ sex + age + ph.karno, 
+              data = lung)
+```
+
+```{r P1-hint-9}
+# Check the PH assumption using function cox.zph() - check the code in slide 240, and 
+# Section 4.4, Survival Analysis in R Companion
+
+# Produce the plot separately per variables and add the coefficient from the final Cox 
+# model (i.e., the PH assumption). We want to see if the red line is a good 
+# approximation of the black one. Check the R code appendix, Section 4.4.
+```
+```{r P1-hint-10}
+# The code is
+check_PH <- cox.zph(fit4)
+
+plot(check_PH, var = 1)
+abline(h = coef(fit4)[1], col = "red", lwd = 2)
+
+plot(check_PH, var = 2)
+abline(h = coef(fit4)[2], col = "red", lwd = 2)
+
+plot(check_PH, var = 3)
+abline(h = coef(fit4)[3], col = "red", lwd = 2)
+```
+
+```{r P1-hint-11}
+# We observe that the PH assumptions does not seem to be satisfied for 'age' and
+# 'ph.karno'.
+
+# One solution discussed in slide 243 is to partion the time axis. From oberve that 
+# from the two variables, for 'age' the PH seems to be more strongly violated. In addition,
+# from the plot we observe that there is a first period up to 170-180 days where the 
+# coefficient of age drops, and following ramains a bit more constatn. 
+# Hence, we decide to split the time axis at 170 days.
+
+# We create two data sets, one up to 170 days, in which we treat a censored patients who
+# had the event after 170 days, and on after 170 days, in which we only consider the 
+# patient at risk at 170 days.
+
+# First, create the code to create these two datasets.
+```
+```{r P1-hint-12}
+# The code is:
+lung_b170 <- lung
+lung_b170$status[lung_b170$time > 170] <- 1
+lung_a170 <- lung[lung$time > 170, ]
+```
+
+```{r P1-hint-13}
+# Fit your previous final model in the two datasets
+```
+```{r P1-hint-14}
+# The code is:
+fit4_b170 <- coxph(Surv(time, status) ~ sex + age + ph.karno, data = lung_b170)
+fit4_a170 <- coxph(Surv(time, status) ~ sex + age + ph.karno, data = lung_a170)
+```
+
+```{r P1-hint-15}
+# Check the PH assumption, as before using cox.zph(), for the first model.
+# Do also the plots.
+```
+```{r P1-hint-16}
+# The code is:
+check_PH_b170 <- cox.zph(fit4_b170)
+
+plot(check_PH_b170, var = 1)
+abline(h = coef(fit4_b170)[1], col = "red", lwd = 2)
+
+plot(check_PH_b170, var = 2)
+abline(h = coef(fit4_b170)[2], col = "red", lwd = 2)
+
+plot(check_PH_b170, var = 3)
+abline(h = coef(fit4_b170)[3], col = "red", lwd = 2)
+```
+
+```{r P1-hint-17}
+# PH is still not perfect for 'age', but it is better.
+
+# Check PH for the second model fitted in the dataset after 170 days.
+``` 
+```{r P1-hint-18}
+# The code is:
+check_PH_a170 <- cox.zph(fit4_a170)
+
+plot(check_PH_a170, var = 1)
+abline(h = coef(fit4_a170)[1], col = "red", lwd = 2)
+
+plot(check_PH_a170, var = 2)
+abline(h = coef(fit4_a170)[2], col = "red", lwd = 2)
+
+plot(check_PH_a170, var = 3)
+abline(h = coef(fit4_a170)[3], col = "red", lwd = 2)
+``` 
+
+### Question 2
+
+We are interested in estimating survival probabilities for males and females with the 
+median age and with the average Karnofsky score. 
+
+a. Which are the median survival times and their 95% confidence limits for males and 
+females with median age and average Karnofsky score?
+
+b. Plot the corresponding survival curves.
+
+c. What are the corresponding survival probabilities for 200, 400, 600 and 800 days?
+
+From the previous question, you need to use the datasets `lung_b170` and `lung_a170`, and
+the fitted Cox models `fit4_a170` and `fit4_b170`.
+
+```{r P2-setup}
+lung_b170 <- lung
+lung_b170$status[lung_b170$time > 170] <- 1
+lung_a170 <- lung[lung$time > 170, ]
+fit4_b170 <- coxph(Surv(time, status) ~ sex + age + ph.karno, data = lung_b170)
+fit4_a170 <- coxph(Surv(time, status) ~ sex + age + ph.karno, data = lung_a170)
+```
+
+```{r P2, exercise=TRUE, exercise.lines = 20}
+
+```
+
+```{r P2-hint-1}
+# Remember that we work with the two additive Cox models fitted to the two datasets 
+# before and after 170 days.
+
+# First we need to define the dataset that contains the information of the type of 
+# patients for which we want to calculate the survival probabilities.
+
+# Create these two datasets using a source (i.e., to calculate the median age and mean
+# Karnofsky score) the datasets based on which thw models were fitted.
+
+# Use expand.grid() - check the code in slides 292-293, and 
+# Section 5.1, Survival Analysis in R Companion
+```
+```{r P2-hint-2}
+# The code is (this code only creates the datasets and does not produce any output):
+ND_b170 <- with(lung_b170, expand.grid(
+    sex = levels(sex), age = median(age), ph.karno = mean(ph.karno)
+))
+
+ND_a170 <- with(lung_a170, expand.grid(
+    sex = levels(sex), age = median(age), ph.karno = mean(ph.karno)
+))
+```
+
+```{r P2-hint-3}
+# Calculate the survival probabilities for the before model using survfit() and the data
+# from above. Produce also the plot.
+```
+```{r P2-hint-4}
+# The code is:
+probs_b170 <- survfit(fit4_b170, newdata = ND_b170)
+
+probs_b170
+
+plot(probs_b170)
+```
+
+```{r P2-hint-5}
+# Do the same for the after model, and here also compute the survival probabilities at 
+# 200, 400, 600 and 800 days using the summary() method and the 'times' argument.
+```
+```{r P2-hint-6}
+# The code is:
+probs_a170 <- survfit(fit4_a170, newdata = ND_a170)
+
+probs_a170
+
+plot(probs_a170)
+
+summary(probs_a170, times = c(200, 400, 600, 800))
+```
+
+### Question 3
+
+For the rest of the questions we consider the additive Cox PH model with `sex`, `age` and 
+`ph.karno` fitted in the original `lung` database (i.e., not the two databases before and 
+after 170 days). It is believed that the baseline hazard of death has a completely 
+different shape for patients with ECOG score greater than 0 compared to patients with ECOG
+equal to 0, i.e., the hazard functions of the two groups is not analogous. First, from the
+`ph.ecog` variable that takes values from 0 to 3, construct the variable `ph.ecog2` that 
+groups together the values 1-3. Then, fit an appropriate Cox model that takes the feature 
+described above into account, and then interpret the results. Name the fitted model 
+`fit5`.
+
+```{r P3, exercise=TRUE, exercise.lines = 15}
+
+```
+
+```{r P3-hint-1}
+# First, we need to construct the 'ph.ecog2'. Start by setting the variable as a copy of
+# the original 'ph.ecog'. Then set the values of 'ph.ecog2' which are greater than 0 
+# equal to 1.
+```
+```{r P3-hint-2}
+# The code is (this code only constructs the variable and does not produce any output):
+lung$ph.ecog2 <- lung$ph.ecog
+lung$ph.ecog2[lung$ph.ecog2 > 0] <- 1
+```
+
+```{r P3-hint-3}
+# First, we need to construct the 'ph.ecog2'. Start by setting the variable as a copy of
+# the original 'ph.ecog'. Then set the values of 'ph.ecog2' which are greater than 0 
+# equal to 1.
+```
+```{r P3-hint-4}
+# The code is:
+fit5 <- coxph(Surv(time, status) ~ sex + age + ph.karno + strata(ph.ecog2), data = lung)
+
+summary(fit5)
+```
+
+### Question 4
+
+The team of physicians of the North Central Cancer Treatment Group (who are responsible
+for the Lung study) believe that the effects of `sex`, `age` and `ph.karno` in the risk 
+of death are different for the two ECOG groups. Extend the model `fit5` of Q3 accordingly,
+and test whether this hypothesis is supported by the data for each of the two predictors.
+
+```{r P4-setup}
+lung$ph.ecog2 <- lung$ph.ecog
+lung$ph.ecog2[lung$ph.ecog2 > 0] <- 1
+fit5 <- coxph(Surv(time, status) ~ sex + age + ph.karno + strata(ph.ecog2), data = lung)
+```
+```{r P4, exercise=TRUE, exercise.lines = 15}
+
+```
+
+```{r P4-hint-1}
+# Check slides 299 & 302, and Section 5.2, Survival Analysis in R Companion
+
+# You will need to include the interaction between the stratifying factor and the three
+# covariates, and do the LRT to compare with the previous model.
+```
+```{r P4-hint-2}
+# The code is:
+fit6 <- coxph(Surv(time, status) ~ (sex + age + ph.karno) * strata(ph.ecog2), data = lung)
+
+anova(fit5, fit6)
+```

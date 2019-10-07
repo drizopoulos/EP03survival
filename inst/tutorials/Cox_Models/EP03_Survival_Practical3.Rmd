@@ -1,0 +1,307 @@
+---
+title: "Survival - Practical 3: Cox PH Models"
+output: 
+  learnr::tutorial:
+     allow_skip: true
+runtime: shiny_prerendered
+---
+
+```{r setup, include=FALSE}
+library("learnr")
+library("survival")
+library("lattice")
+library("splines")
+data("aids.id", package = "JM")
+knitr::opts_chunk$set(echo = FALSE)
+
+```
+
+
+## Quiz
+
+The following questions test your knowledge in the Cox proportional hazards models 
+presented in Chapter 4.
+
+### Question 1
+
+```{r Q1}
+quiz(
+  question("In Cox PH models the regression parameters in their original scale (i.e., no transformation) quantify changes for which quantity?",
+    answer("The log failure time."),
+    answer("The failure time."),
+    answer("The expected log failure time."),
+    answer("The expected failure time."),
+    answer("The log hazard function.", correct = TRUE),
+    answer("The hazard function."),
+    answer("None of the above."),
+    allow_retry = TRUE, random_answer_order = FALSE
+  )
+)
+```
+
+### Question 2
+In a study for hypertensive patients a new medical treatment is compared with the 
+traditional medication. The hazard ratio for a major cardiac incident between the two
+treatments is 0.78 (95% CI: 0.71; 0.86).
+
+```{r Q2}
+quiz(
+  question("Which of the following statements is correct?",
+    answer("The new treatment lowers the chance of a major cardiac event by 22%."),
+    answer("The new treatment lowers the risk of a major cardiac event by 22%."),
+    answer("The traditional treatment increases the instaneous risk of a major cardiac event by 28%.", correct = TRUE),
+    answer("The traditional treatment increases the instaneous risk of a major cardiac event by 22%."),
+    answer("The traditional treatment increases the risk of a major cardiac event by 28%."),
+    answer("The traditional treatment increases the risk of a major cardiac event by 22%."),
+    answer("None of the above statements is correct."),
+    allow_retry = TRUE, random_answer_order = FALSE
+  )
+)
+```
+
+### Question 3
+Continuing on the result from the study described in Question 2, we observe that the 95%
+confidence interval for the hazard ratio is slightly non-symetric.
+
+```{r Q3}
+quiz(
+  question("Which of the following statements is correct?",
+    answer("The 95% CI is non-symmetric due to rounding error."),
+    answer("The 95% CI has been wrongly calculated, it should be exactly symmetric."),
+    answer("The 95% CI for the log hazard ratio is symmetric, not for the hazad ratio.", correct = TRUE),
+    answer("The 95% CI is non-symmetric due to the semi-parametric nature of the Cox model (i.e., as other non-parametric methods)."),
+    allow_retry = TRUE, random_answer_order = TRUE
+  )
+)
+```
+
+### Question 4
+
+```{r Q4}
+quiz(
+  question("Why Cox PH models are called semi-parametric models?",
+    answer("Because we make no assumptions for the distribution of the covariates in the model."),
+    answer("Because we make no assumptions for the distribution of the survival times.", correct = TRUE),
+    answer("Because the effects of covariates on the hazard function can be nonlinear."),
+    answer("Because they do not have error terms as AFT models do."),
+    allow_retry = TRUE, random_answer_order = TRUE
+  )
+)
+```
+
+### Question 5
+
+```{r Q5}
+quiz(
+  question("What is a consequence of the fact that Cox models are semi-parametric (more that one correct possible)?",
+    answer("We cannot obtain absolute instantaneous risks only relative instantaneous risks.", correct = TRUE),
+    answer("We cannot obtain relative instantaneous risks only absolute instantaneous risks."),
+    answer("We cannot obtain survival probabilities.", correct = TRUE),
+    answer("We cannot obtain expected failure times as in AFT models.", correct = TRUE),
+    answer("We cannot obtain relative risks (i.e., ratio of probabilities not hazards).", correct = TRUE),
+    allow_retry = TRUE, random_answer_order = TRUE
+  )
+)
+```
+
+### Question 6
+
+```{r Q6}
+quiz(
+  question("Which of the following statements stems from the proportional hazards assumption?",
+    answer("The instantaneous risk of an event remains constant over time."),
+    answer("The effect of covariates on the hazard remains constant over time.", correct = TRUE),
+    answer("The baseline instantaneous risk remains constant over time."),
+    answer("Covariates remain constant over time (i.e., we have only baseline covariates)."),
+    allow_retry = TRUE, random_answer_order = TRUE
+  )
+)
+```
+
+## Exercises
+
+The purpose of this practical is to illustrate how the Cox proportional hazards model can 
+be fitted in R.
+
+The following questions are based on the AIDS dataset. This dataset is available as the 
+object `aids.id` and is already loaded in this session. From this dataset we will use the 
+following variables:
+
+- `Time`: the observed time-to-death in months.
+
+- `death`: the event indicator; '1' denotes death and '0' censored observation.
+
+- `CD4`: baseline CD4 cell count measurement.
+
+- `drug`: the treatment indicator with values 'ddC' and 'ddI'.
+
+- `AZT`: indicator denoting whether the patient was enrolled because of AZT 'intolerance' 
+or AZT 'failure'.
+
+For the exercises below it will be rather useful to check the corresponding sections of the
+[Survival Analysis in R Companion](http://www.drizopoulos.com/courses/EMC/EP03_%20Survival%20Analysis%20in%20R%20Companion.html) that are given in the hints.
+
+### Question 1
+
+Fit a Cox model that relaxes the linearity assumption for the effect of `CD4` using 
+natural cubic splines (for this you will need to use function `ns()`, i.e., within the 
+formula argument of `coxph()` use `ns(CD4, 3)`). In addition, include the main effects of 
+`drug` and `AZT`, and the interaction effects of `CD4` with both `drug` and `AZT`. Name 
+the fitted model `fit1`.
+
+```{r P1, exercise=TRUE, exercise.lines = 10}
+
+```
+
+```{r P1-hint-1}
+# Check the examples in slides 191 & 262-263, and 
+# Section 4.1, Survival Analysis in R Companion 
+```
+```{r P1-hint-2}
+# Fit the Cox model
+fit1 <- coxph(Surv(Time, death) ~ ns(CD4, 3) * (drug + AZT), data = aids.id)
+summary(fit1)
+```
+
+### Question 2
+
+Use a likelihood ratio test to test whether the model `fit1` can be reduced by dropping all 
+interaction terms. Depending on the result choose the model that you will use for the 
+remaining questions unless otherwise stated. Name the final fitted model `fit2`.
+
+```{r P2-setup}
+fit1 <- coxph(Surv(Time, death) ~ ns(CD4, 3) * (drug + AZT), data = aids.id)
+```
+
+```{r P2, exercise=TRUE, exercise.lines = 10}
+
+```
+
+```{r P2-hint-1}
+# Check the example in slides 213, and Section 4.3, Survival Analysis in R Companion
+```
+```{r P2-hint-2}
+# We first fit the model under the null hypothesis (i.e., removing the interaction terms)
+fit2 <- coxph(Surv(Time, death) ~ ns(CD4, 3) + drug + AZT, data = aids.id)
+
+# Then using anova() we compare with fit1 using a likelihood ratio test
+anova(fit2, fit1)
+```
+
+### Question 3
+
+Use the `summary()` method to obtain a detailed summary of the fitted model `fit2`. What 
+is the interpretation of the estimated coefficient for `drug`? In addition, in the output 
+you have values for `exp(coef)` and `exp(-coef)`. What do these values represent? 
+
+```{r P3-setup}
+fit2 <- coxph(Surv(Time, death) ~ ns(CD4, 3) + drug + AZT, data = aids.id)
+```
+
+```{r P3, exercise=TRUE, exercise.lines = 10}
+
+```
+
+```{r P3-hint-1}
+# Just use summary() for model fit2.
+```
+```{r P3-hint-2}
+summary(fit2)
+```
+
+### Question 4
+
+Using the model of Question 1 `fit1`, create an effects plot depicting how the average log
+hazard ratio changes with increasing values of `CD4`, for 'ddI' and 'ddC' patients who had 
+enrolled because of either AZT 'intolerance' or AZT 'failure'. What do you observe?
+
+```{r P4-setup}
+fit1 <- coxph(Surv(Time, death) ~ ns(CD4, 3) * (drug + AZT), data = aids.id)
+```
+
+```{r P4, exercise=TRUE, exercise.lines = 15}
+
+```
+
+```{r P4-hint-1}
+# Check the example in slides 198-201, and Section 4.2, Survival Analysis in R Companion
+```
+
+```{r P4-hint-2}
+# We create the database based on which predictions will be made. We need three 
+# variables/columns: 'drug' (both 'ddC' and 'ddI'), 'AZT' (both 'intolerance' and 'failure'), 
+# and 'CD4' increasing from 0 to 10.
+
+# Use function expand.grid()
+```
+
+```{r P4-hint-3}
+# the code is (this code just creates the dataset and does not create any output)
+ND <- expand.grid(CD4 = seq(0, 10, length.out = 20), drug = c("ddC", "ddI"), 
+                  AZT = c("intolerance", "failure"))
+
+```
+
+```{r P4-hint-4}
+# Calculate the predictions using the same code as in slide 200, using model 'fit1'
+```
+
+```{r P4-hint-5}
+# the code is
+prs <- predict(fit1, newdata = ND, type = "lp", se.fit = TRUE)
+ND$pred <- prs[[1]]
+ND$se <- prs[[2]]
+ND$lo <- ND$pred - 1.96 * ND$se
+ND$up <- ND$pred + 1.96 * ND$se
+
+# the first lines of ND are
+head(ND)
+```
+
+```{r P4-hint-6}
+# Produce the plot using the same code as in slide 201.
+# Note, you will need to adapt a bit this code, namely
+# you will need to use 'CD4' instead of 'age', and 'AZT*drug' instead of  only 'drug'
+```
+
+```{r P4-hint-7}
+# the code is
+xyplot(pred + lo + up ~ CD4 | AZT * drug, data = ND, 
+       col = c("red", "black", "black"), lty = c(1, 2, 2), lwd = 2, type = "l",
+       abline = list(h = 0, lty = 2), xlab = "CD4", ylab = "log Hazard Ratio")
+```
+
+### Question 5
+
+Using the Kaplan-Meier estimator to compare whether the proportional hazards assumption is 
+justified for `AZT`.
+
+```{r P5, exercise=TRUE, exercise.lines = 15}
+
+```
+
+```{r P5-hint-1}
+# Check the example in slide 229, and Section 4.4, Survival Analysis in R Companion
+```
+
+```{r P5-hint-2}
+# First calculate the Kaplan-Meier estimator for the two levels of AZT;
+# this is done using survfit()
+```
+
+```{r P5-hint-3}
+# the code is (this code just computes the KM estimator and does not create any output)
+fit <- survfit(Surv(Time, death) ~ AZT, data = aids.id)
+```
+
+```{r P5-hint-4}
+# Then produce the figure using the code from slide 229
+```
+
+```{r P5-hint-5}
+# the code is
+par(mfrow = c(1, 2))
+plot(fit, xlab = "Months", ylab = "Survival", col = 1:2)
+plot(fit, fun = function (s) -log(-log(s)), xlab = "Months", 
+    ylab = "-log(- log(Survival))", col = 1:2)
+```

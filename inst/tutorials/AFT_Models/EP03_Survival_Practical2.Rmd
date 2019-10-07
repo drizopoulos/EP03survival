@@ -1,0 +1,312 @@
+---
+title: "Survival - Practical 2: AFT Models"
+output: 
+  learnr::tutorial:
+     allow_skip: true
+runtime: shiny_prerendered
+---
+
+```{r setup, include=FALSE}
+library("learnr")
+library("survival")
+library("lattice")
+data("lung", package = "survival")
+lung$sex <- factor(lung$sex, labels = c("male", "female"))
+lung <- with(lung, lung[complete.cases(time, status, sex, age, ph.karno), ])
+knitr::opts_chunk$set(echo = FALSE)
+
+```
+
+
+## Quiz
+
+The following questions test your knowledge in the accelerated failure time models 
+presented in Chapter 4.
+
+### Question 1
+
+```{r Q1}
+quiz(
+  question("In AFT models the regression parameters in their original scale (i.e., no transformation) quantify changes for which quantity?",
+    answer("The log failure time."),
+    answer("The failure time."),
+    answer("The expected log failure time.", correct = TRUE),
+    answer("The expected failure time."),
+    answer("The log hazard function."),
+    answer("The hazard function."),
+    answer("None of the above."),
+    allow_retry = TRUE, random_answer_order = FALSE
+  )
+)
+```
+
+### Question 2
+
+```{r Q2}
+quiz(
+  question("With regard to the distribution of the error terms in AFT models, which of the following statements is correct?",
+    answer("The choice for the distribution of the error terms will not affect the coefficients' estimates."),
+    answer("The choice for the distribution of the error terms minimally affects the coefficients' estimates."),
+    answer("Without fitting the corresponding AFT models, we cannot tell how much the choice of the distribution will affect the coefficients' estimates.", correct = TRUE),
+    answer("None of the above."),
+    allow_retry = TRUE, random_answer_order = FALSE
+  )
+)
+```
+
+### Question 3
+
+```{r Q3}
+quiz(
+  question("Which of the following statements is correct with regard to effect plots?",
+    answer("Effect plots are most useful for additive models without interaction terms."),
+    answer("Effect plots are most useful for models with interaction terms.", correct = TRUE),
+    answer("Effect plots are most useful for models without categorical covariates."),
+    answer("Effect plots are most useful for models without continuous covariates."),
+    answer("None of the above."),
+    allow_retry = TRUE, random_answer_order = TRUE
+  )
+)
+```
+
+### Question 4
+
+```{r Q4}
+quiz(
+  question("Which of the following statments is a requirement in order to compare two AFT models with a likelihood ratio test (more than one correct possible)?",
+    answer("The models need to be nested (one is a special case of the other).", correct = TRUE),
+    answer("The models need to be fitted with the same distribution for the error terms.", correct = TRUE),
+    answer("The models need to contain only categorical covariates."),
+    answer("The models need to contain only continuous covariates."),
+    answer("The models need to contain both categorical and continuous covariates."),
+    allow_retry = TRUE, random_answer_order = TRUE
+  )
+)
+```
+
+### Question 5
+
+In a study investigating potential risk factors for the expected survival time of 
+prostate cancer patients a team of researchers has fitted an accelerated failure time model
+assuming a normal distribution for the error terms. The team members have some conflicting 
+ideas on how to check the normality assumption and they come to you for advice. Below you
+find some of their ideas to check this assumption.
+
+```{r Q5}
+quiz(
+  question("Which one is correct?",
+    answer("Check the shape of the histogram of the residuals."),
+    answer("Compute the Shapiro-Wilk test for the residuals."),
+    answer("Check whether the Kaplan-Meier estimate of the residuals agrees with the survival function of the normal distribution.", correct = TRUE),
+    answer("Use the Q-Q plot of the residuals."),
+    allow_retry = TRUE, random_answer_order = TRUE
+  )
+)
+```
+
+## Exercises
+
+The purpose of these exercises is to illustrate how Accelerated Failure Time model can be 
+fitted in R.
+
+The following questions are based on the Lung dataset. This dataset is available as 
+the object `lung` from package **survival**, which is already loaded in this session. 
+From this data set we will use the following variables:
+
+- `time`: the observed time-to-death in days.
+
+- `status`: the event indicator; '1' denotes censored and '2' denotes death.
+
+- `age`: the age in years.
+
+- `ph.karno`: Karnofsky performance score rated by the physician.
+
+- `sex`: the sex indicator with values 'male' and 'female'.
+
+For the exercises below it will be rather useful to check the corresponding sections of the
+[Survival Analysis in R Companion](http://www.drizopoulos.com/courses/EMC/EP03_%20Survival%20Analysis%20in%20R%20Companion.html) that are given in the hints.
+
+### Question 1
+
+Our initial hypothesis is that the time-to-death is affected by `sex`, `age` and 
+`ph.karno`. In addition, we also believe that the effects of `age` and `ph.karno` on the 
+expected failure time are not the same for males and females. Transform this initial 
+hypothesis into a suitable AFT model. For the error terms assume the extreme value 
+distribution, which as we have seen, corresponds to the Weibull distribution for the 
+time-to-death. Name the fitted model `fit1`.
+
+```{r P1, exercise=TRUE, exercise.lines = 10}
+
+```
+
+```{r P1-hint-1}
+# Check the example in slide 133, and Section 3.1, Survival Analysis in R Companion
+```
+```{r P1-hint-2}
+# Fit the AFT model
+fit1 <- survreg(Surv(time, status) ~ sex * (age + ph.karno), data = lung,
+                dist = "weibull")
+summary(fit1)
+```
+
+### Question 2
+
+We would like to test whether some aspects of our initial hypothesis are supported by the 
+data. In particular, we are interested in testing:
+1. whether `sex` has at all an effect in the time-to-death, and
+2. whether the effects of `age` and `ph.karno` are equal for males and females. 
+
+Based on the results of these two hypotheses, simplify the model appropriately. Name the 
+final fitted model `fit3`.
+
+```{r P2-setup}
+fit1 <- survreg(Surv(time, status) ~ sex * (age + ph.karno), data = lung,
+                dist = "weibull")
+```
+
+```{r P2, exercise=TRUE, exercise.lines = 10}
+
+```
+
+```{r P2-hint-1}
+# Check the example in slide 160, and Section 3.3, Survival Analysis in R Companion
+
+# We want to test the overall effect of sex => From the previous model remove sex;
+# then use the anova() function to do the LRT.
+```
+
+```{r P2-hint-2}
+# the code is
+fit2 <- survreg(Surv(time, status) ~ age + ph.karno, data = lung)
+
+anova(fit2, fit1)
+```
+
+```{r P2-hint-3}
+# for the 2nd question we want to test the interaction terms => Go again in the full 
+# model (i.e., the model under the alternative hypothesis) and remove the interactions;
+
+# then use the anova() function to compute the corresponding LRT.
+```
+
+```{r P2-hint-4}
+# the code is
+fit3 <- survreg(Surv(time, status) ~ sex + age + ph.karno, data = lung)
+
+anova(fit3, fit1)
+```
+
+### Question 3
+
+For the final model `fit3` obtained in Question 2 create an effects plot depicting how the 
+average failure time changes with increasing values of `ph.karno`, for the median age.
+
+```{r P3-setup}
+fit3 <- survreg(Surv(time, status) ~ sex + age + ph.karno, data = lung)
+```
+
+```{r P3, exercise=TRUE, exercise.lines = 15}
+
+```
+
+```{r P3-hint-1}
+# Check the example in slides 145-148, and Section 3.2, Survival Analysis in R Companion
+
+# First calculate what is the median age, and what the observed range of 'ph.karno' in
+# our data (for the latter use function range())
+```
+
+```{r P3-hint-2}
+# the code is
+with(lung, median(age))
+
+with(lung, range(ph.karno))
+```
+
+```{r P3-hint-3}
+# Hence, the median age is 63, and the observed range of ph.karno is from 50 to 100.
+
+# We then create the database based on which predictions will be made. We need three 
+# variables/columns: 'sex' (both 'male' and 'female'), 'age' (equal to 63), and 
+# 'ph.karno' increase from 50 to 100.
+
+# Use function expand.grid()
+```
+
+```{r P3-hint-4}
+# the code is (this code just creates the dataset and does not create any output)
+ND <- expand.grid(sex = c("male", "female"), age = 63, ph.karno = seq(50, 100, length.out = 50))
+
+```
+
+```{r P3-hint-5}
+# Calculate the predictions using the same code as in slide 147, using model 'fit3'
+```
+
+```{r P3-hint-6}
+# the code is
+prs <- predict(fit3, ND, se.fit = TRUE, type = "lp")
+ND$pred <- prs[[1]]
+ND$se <- prs[[2]]
+ND$lo <- exp(ND$pred - 1.96 * ND$se)
+ND$up <- exp(ND$pred + 1.96 * ND$se)
+ND$pred <- exp(ND$pred)
+
+# the first lines of ND are
+head(ND)
+```
+
+```{r P3-hint-7}
+# Produce the plot using the same code as in slide 148.
+# Note, you will need to adapt a bit this code, namely
+# you will need to use 'ph.karno' instead of 'age', and 'sex' instead of 'drug'
+```
+
+```{r P3-hint-8}
+# the code is
+xyplot(pred + lo + up ~ ph.karno | sex, data = ND, type = "l", 
+    lty = c(1, 2, 2), col = c(2, 1, 1), lwd = 3, 
+    xlab = "Karnofsky Performance Score", ylab = "Survival Time")
+```
+
+### Question 4
+
+Check whether the assumption of the extreme value distribution for the error terms is 
+violated for your final model `fit3` using the AFT residuals. What is your conclusion?
+
+```{r P4-setup}
+fit3 <- survreg(Surv(time, status) ~ sex + age + ph.karno, data = lung)
+```
+
+```{r P4, exercise=TRUE, exercise.lines = 15}
+
+```
+
+```{r P4-hint-1}
+# Check the example in slides 168-169, and Section 3.4, Survival Analysis in R Companion
+
+# This is for model 'fit3' that we have been using so far. 
+# First extract the fitted values, then calculate the residuals and then 
+# calculate the Kaplan-Meier estimator of these residuals.
+```
+
+```{r P4-hint-2}
+# the code is (this code just calculates the residuals and does not create any output):
+fits <- fit3$linear.predictors
+resids <- (fit3$y[, 1] - fits) / fit3$scale
+resKM <- survfit(Surv(resids, status) ~ 1, data = lung)
+```
+
+```{r P4-hint-3}
+# Then produce the plot of the Kaplan-Meier and add the red line by 
+# using the code as in slide 169.
+```
+
+```{r P4-hint-4}
+plot(resKM, mark.time = FALSE, xlab = "AFT Residuals", 
+    ylab = "Survival Probability", main = "AIDS Data Set")
+xx <- seq(min(resids), max(resids), length.out = 35)
+yy <- exp(- exp(xx))
+lines(xx, yy, col = "red", lwd = 2)
+```
+

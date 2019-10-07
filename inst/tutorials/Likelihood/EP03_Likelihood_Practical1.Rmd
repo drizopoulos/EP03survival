@@ -1,0 +1,321 @@
+---
+title: "Likelihood - Practical 1: Linear Regression Models in R"
+output: 
+  learnr::tutorial:
+     allow_skip: true
+runtime: shiny_prerendered
+---
+
+```{r setup, include=FALSE}
+library("learnr")
+data("pbc2.id", package = "JM")
+knitr::opts_chunk$set(echo = FALSE)
+
+```
+
+
+## Quiz
+
+The following questions test your knowledge in the introductory chapter of the principle
+of maximum likelihood, hypothesis testing and confidence intervals and regression models.
+
+### Question 1
+
+Three statements about p-values are:
+
+1. The p-value is the chance that the null hypothesis is correct.
+2. The p-value is 1 minus the chance that the alternative hypothesis is correct.
+3. The p-value is the chance that the data we have observed come from the null hypothesis.
+
+```{r Q1}
+quiz(
+  question("Which of the following is correct?",
+    answer("Statement 1 is correct, and the others wrong."),
+    answer("Statement 2 is correct, and the others wrong."),
+    answer("Statement 3 is correct, and the others wrong."),
+    answer("Only Statements 1 and 3 are correct."),
+    answer("None of the statments is correct.", correct = TRUE),
+    allow_retry = TRUE, random_answer_order = FALSE
+  )
+)
+```
+
+### Question 2
+
+The maximum likelihood estimation methods gives us consistent estimates.
+```{r Q2}
+quiz(
+  question("What does this mean?",
+    answer("The esimates we obtain are unbiased."),
+    answer("The estimates we obtain equal the true value in the population."),
+    answer("The estimates we obtain comes closer to the true value in the population as the sample size increases.", correct = TRUE),
+    answer("The estimates we obtain are relatively close to the true value in the population."),
+    allow_retry = TRUE, random_answer_order = TRUE
+  )
+)
+```
+
+### Question 3
+
+```{r Q3}
+quiz(
+  question("What happens as sample size increases?",
+    answer("P-values become smaller and confidence intervals narrower.", correct = TRUE),
+    answer("P-values become larger and confidence intervals wider."),
+    answer("P-values become smaller and confidence intervals wider."),
+    answer("P-values become larger and confidence intervals narrower."),
+    allow_retry = TRUE, random_answer_order = TRUE
+  )
+)
+```
+
+### Question 4
+
+```{r Q4}
+quiz(
+  question("In the context of hypothesis testing for regression models, which of the following statements is correct?",
+    answer("With the Wald test we can only test one coefficient at a time."),
+    answer("With the likelihood ratio test we can compare nested models.", correct = TRUE),
+    answer("With the score test we fit the model under the null hypothesis, and hence we can only conclude if the null is correct."),
+    answer("With the Wald test we fit the model under the alternative hypothesis, and hence we can only conclude if the null hypothesis is correct."),
+    allow_retry = TRUE, random_answer_order = TRUE
+  )
+)
+```
+
+## Exercises
+
+The purpose of this practical is to illustrate how standard linear regression models can 
+be performed in R.
+
+The following questions are based on the PBC dataset. This dataset is available as the 
+object `pbc2.id` and is already loaded in this session. From this dataset we will use the 
+following variables:
+
+- `serBilir`: baseline serum bilirubin in mg/dl.
+
+- `drug`: the treatment indicator with values 'placebo' and 'D-penicil'.
+
+- `age`: baseline age in years.
+
+- `sex`: the sex indicator with values 'male' and 'female'.
+
+- `serChol`: baseline serum cholesterol in mg/dl.
+
+- `prothrombin`: baseline prothrombin time in sec.
+
+### Question 1
+
+We want to see how the log-transformed serum bilirubin time is related with the rest of 
+the variables. Start by fitting an additive linear regression model, using function 
+`lm()`, and interpret the results you obtain from the `summary()` method. Name the fitted 
+model `fit1`.
+
+```{r P1, exercise=TRUE, exercise.lines = 10}
+
+```
+
+```{r P1-hint-1}
+# Linear regression models are fitted with function lm().
+# As first argument you need to provide a formula of the model you want to fit.
+# Specify also the 'data' argument that is the database containing the variables you
+# want to use - here is 'pbc2.id'
+```
+```{r P1-hint-2}
+# The code for the additive model is:
+fit1 <- lm(log(serBilir) ~  drug + age + sex + serChol + prothrombin, 
+          data = pbc2.id)
+
+summary(fit1)
+```
+
+### Question 2
+
+Check the residuals of model `fit1` using the `plot()` method; before calling `plot()`,
+set `par(mfrow = c(2, 2))` in order to obtain the first basic plots in one figure.
+
+
+```{r P2-setup}
+fit1 <- lm(log(serBilir) ~  drug + age + sex + serChol + prothrombin, 
+          data = pbc2.id)
+```
+
+```{r P2, exercise=TRUE, exercise.lines = 10}
+
+```
+
+```{r P2-hint-1}
+# Just first execute par(mfrow = c(2, 2)) and the plot() of your model from the 
+# previous question
+```
+```{r P2-hint-2}
+# The code is:
+par(mfrow = c(2, 2))
+plot(fit1)
+```
+
+### Question 3
+
+We believe that the association between `serBilir` and each one of `age`, `serChol` and 
+`prothrombin` could be different between males and females. Extend the previous model 
+`fit1` to accommodate this. Use again the `summary()` method to get a detailed output and 
+interpret the results. Name the fitted model `fit2`.
+
+```{r P3, exercise=TRUE, exercise.lines = 10}
+
+```
+
+```{r P3-hint-1}
+# We will actually need to include the interaction terms between 'sex' and each on of
+# 'age', 'serChol' and 'prothrombin'
+
+# An interaction term between two variables is included using the ':', e.g., 'sex:age'
+```
+```{r P3-hint-2}
+# The code is:
+fit2 <- lm(log(serBilir) ~  drug + age + sex + serChol + prothrombin + 
+               sex:age + sex:serChol + sex:prothrombin, 
+          data = pbc2.id)
+
+# To write exactly the same model but in a shorter syntax, we can use the '*'.
+# The include both the main effects and interaction terms between the two variables.
+# Hence, a shorter code is:
+fit2 <- lm(log(serBilir) ~  drug + sex * (age + serChol + prothrombin), 
+          data = pbc2.id)
+
+summary(fit2)
+```
+
+### Question 4
+
+We would like to statistically test whether the extra interaction terms really improve the
+fit of the model. Using an F-test (the analogues likelihood ratio test for linear 
+regression models), compare the interaction model `fit2` with the additive model `fit1`. 
+In R this is done using the `anova()` function.
+
+```{r P4-setup}
+fit1 <- lm(log(serBilir) ~  drug + age + sex + serChol + prothrombin, 
+          data = pbc2.id)
+fit2 <- lm(log(serBilir) ~  drug + sex * (age + serChol + prothrombin), 
+          data = pbc2.id)
+```
+
+```{r P4, exercise=TRUE, exercise.lines = 10}
+
+```
+
+```{r P4-hint-1}
+# Just use the anova() function giving as arguments the two models
+```
+```{r P4-hint-2}
+# The code is:
+anova(fit1, fit2)
+```
+
+### Question 5
+
+Given that the F-test suggests that some of the interaction terms are significant, we 
+could proceed to look whether we need all of them or some of them. To find these, we could
+directly look at the individual p-values from the `summary()` output of the last model 
+`fit2`. However, one issue is that these p-values are not corrected for multiple testing. 
+Using the `p.adjust()` function obtain the adjusted p-values.
+
+```{r P5-setup}
+fit2 <- lm(log(serBilir) ~  drug + sex * (age + serChol + prothrombin), 
+          data = pbc2.id)
+```
+
+```{r P5, exercise=TRUE, exercise.lines = 10}
+
+```
+
+```{r P5-hint-1}
+# First save the output of summary() in an object, e.g., 'summ_fit2'
+```
+```{r P5-hint-2}
+# The code is (this code just saves the output of summary() in the object 'summ_fit2' and 
+# does not produce any output):
+summ_fit2 <- summary(fit2)
+```
+```{r P5-hint-3}
+# Use function coef() to extract the coefficients' table from 'summ_fit2'
+```
+```{r P5-hint-4}
+# The code is:
+coef(summ_fit2)
+```
+```{r P5-hint-5}
+# Hence, the p-values are in the 4th (last) column of the table. Extract the
+# p-values of the interaction tersms from the table using the '[' indexing
+```
+```{r P5-hint-6}
+# The code is:
+coef(summ_fit2)[7:9, 4]
+```
+```{r P5-hint-7}
+# Finally, give these p-values to p.adjust()
+```
+```{r P5-hint-8}
+# The code is:
+p.adjust(coef(summ_fit2)[7:9, 4])
+```
+
+### Question 6
+
+In a second analysis, the researchers are interested in studying the relationship between
+the natural logarithm of serum bilirubin and serum cholesterol corrected for age and sex.
+It is believed that the relationship may be nonlinear. Use a 3rd degree polynomial of 
+serum cholesterol to explore this. Name the fitted model `fit1`.
+
+```{r P6, exercise=TRUE, exercise.lines = 10}
+
+```
+
+```{r P6-hint-1}
+# To include in an R formula polynomials use either the I() or the poly() functions; 
+# preferable is the latter. For example, to include the cubic effect of variable 'x', 
+# use poly(x, 3)
+
+# A feature when using poly() is that you need first to exlude and missing data there are
+# This can be done with the complete.cases() function, e.g., data[complete.cases(data$x), ]
+# removes the rows of 'data' for which 'x' is missing.
+
+# With this information, proceed to fit the model described in the question.
+```
+```{r P6-hint-2}
+# The code is:
+fit1 <- lm(log(serBilir) ~ poly(serChol, 3) + age + sex, 
+           data = pbc2.id[complete.cases(pbc2.id$serChol), ])
+
+summary(fit1)
+```
+
+### Question 7
+
+Investigate whether the relationship is truly nonlinear but first fitting the model that 
+assumes linearity (null hypothesis), and following comparing this model with the previous 
+model `fit1` (alternative hypothesis) using an F-test and the `anova()` function.
+
+```{r P7-setup}
+fit1 <- lm(log(serBilir) ~ poly(serChol, 3) + age + sex, 
+           data = pbc2.id[complete.cases(pbc2.id$serChol), ])
+```
+
+```{r P7, exercise=TRUE, exercise.lines = 10}
+
+```
+
+```{r P7-hint-1}
+# Simply fit the linear model that contains 'serChol', 'age' and 'sex', and compare this
+# with the previous model
+
+# Note: this linear model needs to be fitted in the same version of the dataset as the 
+# nonlinear model, i.e., excluding the rows with missing serum cholesterol values
+```
+```{r P7-hint-2}
+# The code is:
+fit2 <- lm(log(serBilir) ~ serChol + age + sex, 
+           data = pbc2.id[complete.cases(pbc2.id$serChol), ])
+
+anova(fit2, fit1)
+```
