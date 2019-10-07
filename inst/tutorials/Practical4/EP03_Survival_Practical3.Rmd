@@ -11,27 +11,27 @@ library("learnr")
 library("survival")
 library("lattice")
 library("splines")
-data("aids.id", package = "JM")
+load("Data.RData")
 knitr::opts_chunk$set(echo = FALSE)
-
 ```
 
 
 ## Quiz
 
-The following questions test your knowledge in the Cox proportional hazards models 
-presented in Chapter 4.
+The following questions test your knowledge in the framework of Cox proportional hazards 
+models, presented in Chapter 4.
 
 ### Question 1
 
 ```{r Q1}
 quiz(
-  question("In Cox PH models the regression parameters in their original scale (i.e., no transformation) quantify changes for which quantity?",
+  question("In Cox PH models the regression coefficients in their original scale (i.e., no transformation) quantify changes for which quantity?",
     answer("The log failure time."),
     answer("The failure time."),
     answer("The expected log failure time."),
     answer("The expected failure time."),
     answer("The log hazard function.", correct = TRUE),
+    answer("The expected log hazard function."),
     answer("The hazard function."),
     answer("None of the above."),
     allow_retry = TRUE, random_answer_order = FALSE
@@ -40,7 +40,7 @@ quiz(
 ```
 
 ### Question 2
-In a study for hypertensive patients a new medical treatment is compared with the 
+In a study for hypertensive patients, a new medical treatment is compared with the 
 traditional medication. The hazard ratio for a major cardiac incident between the two
 treatments is 0.78 (95% CI: 0.71; 0.86).
 
@@ -69,7 +69,7 @@ quiz(
     answer("The 95% CI is non-symmetric due to rounding error."),
     answer("The 95% CI has been wrongly calculated, it should be exactly symmetric."),
     answer("The 95% CI for the log hazard ratio is symmetric, not for the hazad ratio.", correct = TRUE),
-    answer("The 95% CI is non-symmetric due to the semi-parametric nature of the Cox model (i.e., as other non-parametric methods)."),
+    answer("The 95% CI is non-symmetric due to the semi-parametric nature of the Cox model (i.e., as in other non-parametric methods)."),
     allow_retry = TRUE, random_answer_order = TRUE
   )
 )
@@ -80,8 +80,8 @@ quiz(
 ```{r Q4}
 quiz(
   question("Why Cox PH models are called semi-parametric models?",
-    answer("Because we make no assumptions for the distribution of the covariates in the model."),
-    answer("Because we make no assumptions for the distribution of the survival times.", correct = TRUE),
+    answer("Because they make no assumptions for the distribution of the covariates in the model."),
+    answer("Because they make no assumptions for the distribution of the survival times.", correct = TRUE),
     answer("Because the effects of covariates on the hazard function can be nonlinear."),
     answer("Because they do not have error terms as AFT models do."),
     allow_retry = TRUE, random_answer_order = TRUE
@@ -93,7 +93,7 @@ quiz(
 
 ```{r Q5}
 quiz(
-  question("What is a consequence of the fact that Cox models are semi-parametric (more that one correct possible)?",
+  question("What is a consequence of the fact that Cox models are semi-parametric (more than one correct possible)?",
     answer("We cannot obtain absolute instantaneous risks only relative instantaneous risks.", correct = TRUE),
     answer("We cannot obtain relative instantaneous risks only absolute instantaneous risks."),
     answer("We cannot obtain survival probabilities.", correct = TRUE),
@@ -138,7 +138,7 @@ following variables:
 - `AZT`: indicator denoting whether the patient was enrolled because of AZT 'intolerance' 
 or AZT 'failure'.
 
-For the exercises below it will be rather useful to check the corresponding sections of the
+For the exercises below it will be useful to check the corresponding sections of the
 [Survival Analysis in R Companion](http://www.drizopoulos.com/courses/EMC/EP03_%20Survival%20Analysis%20in%20R%20Companion.html) that are given in the hints.
 
 ### Question 1
@@ -165,7 +165,7 @@ summary(fit1)
 
 ### Question 2
 
-Use a likelihood ratio test to test whether the model `fit1` can be reduced by dropping all 
+Use a likelihood ratio test to test whether model `fit1` can be reduced by dropping all 
 interaction terms. Depending on the result choose the model that you will use for the 
 remaining questions unless otherwise stated. Name the final fitted model `fit2`.
 
@@ -211,7 +211,7 @@ summary(fit2)
 
 ### Question 4
 
-Using the model of Question 1 `fit1`, create an effects plot depicting how the average log
+Using the model of Question 1 ,`fit1`, create an effect plot depicting how the average log
 hazard ratio changes with increasing values of `CD4`, for 'ddI' and 'ddC' patients who had 
 enrolled because of either AZT 'intolerance' or AZT 'failure'. What do you observe?
 
@@ -236,7 +236,7 @@ fit1 <- coxph(Surv(Time, death) ~ ns(CD4, 3) * (drug + AZT), data = aids.id)
 ```
 
 ```{r P4-hint-3}
-# the code is (this code just creates the dataset and does not create any output)
+# The code is (this code just creates the dataset and does not create any output)
 ND <- expand.grid(CD4 = seq(0, 10, length.out = 20), drug = c("ddC", "ddI"), 
                   AZT = c("intolerance", "failure"))
 
@@ -247,25 +247,26 @@ ND <- expand.grid(CD4 = seq(0, 10, length.out = 20), drug = c("ddC", "ddI"),
 ```
 
 ```{r P4-hint-5}
-# the code is
+# The code is
 prs <- predict(fit1, newdata = ND, type = "lp", se.fit = TRUE)
 ND$pred <- prs[[1]]
 ND$se <- prs[[2]]
 ND$lo <- ND$pred - 1.96 * ND$se
 ND$up <- ND$pred + 1.96 * ND$se
 
-# the first lines of ND are
+# The first lines of ND are
 head(ND)
 ```
 
 ```{r P4-hint-6}
 # Produce the plot using the same code as in slide 201.
-# Note, you will need to adapt a bit this code, namely
-# you will need to use 'CD4' instead of 'age', and 'AZT*drug' instead of  only 'drug'
+# Note, you will need to adapt a bit this code, namely,
+# you will need to use 'CD4' instead of 'age', and 
+# 'AZT*drug' instead of  only 'drug'
 ```
 
 ```{r P4-hint-7}
-# the code is
+# The code is
 xyplot(pred + lo + up ~ CD4 | AZT * drug, data = ND, 
        col = c("red", "black", "black"), lty = c(1, 2, 2), lwd = 2, type = "l",
        abline = list(h = 0, lty = 2), xlab = "CD4", ylab = "log Hazard Ratio")
@@ -290,7 +291,7 @@ justified for `AZT`.
 ```
 
 ```{r P5-hint-3}
-# the code is (this code just computes the KM estimator and does not create any output)
+# The code is (this code just computes the KM estimator and does not create any output)
 fit <- survfit(Surv(Time, death) ~ AZT, data = aids.id)
 ```
 
@@ -299,7 +300,7 @@ fit <- survfit(Surv(Time, death) ~ AZT, data = aids.id)
 ```
 
 ```{r P5-hint-5}
-# the code is
+# The code is
 par(mfrow = c(1, 2))
 plot(fit, xlab = "Months", ylab = "Survival", col = 1:2)
 plot(fit, fun = function (s) -log(-log(s)), xlab = "Months", 

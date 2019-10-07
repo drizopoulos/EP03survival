@@ -1,5 +1,5 @@
 export("load_practical")
 
 importFrom("lattice", "xyplot")
-importFrom("JM", "jointModel")
+importFrom("splines", "ns", "bs")
 importFrom("learnr", "run_tutorial")

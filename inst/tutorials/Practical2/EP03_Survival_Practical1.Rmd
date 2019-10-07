@@ -9,9 +9,8 @@ runtime: shiny_prerendered
 ```{r setup, include=FALSE}
 library("learnr")
 library("survival")
-data("aids.id", package = "JM")
+load("Data.RData")
 knitr::opts_chunk$set(echo = FALSE)
-
 ```
 
 
@@ -48,8 +47,8 @@ treatment.
 ```{r Q2}
 quiz(
   question("Which of the following types of analysis would you follow to investigate if the new treatment works?",
-    answer("Perform a two-sample t-test for the two groups of patients to test if the average survival time in the new treatment group is greater than the average survival time in the standard treatment group."),
-    answer("First check if the data are normally distributes; if yes, perform a two-sample t-test, otherwise perform a two-sample Wilcoxon test to test differences in the medians between the two treatment groups."),
+    answer("Perform a two-sample t-test for the two groups of patients to test if the mean survival time in the new treatment group is greater than the mean survival time in the standard treatment group."),
+    answer("First check if the data are normally distributed; if yes, perform a two-sample t-test, otherwise perform a two-sample Wilcoxon test to test differences in the medians between the two treatment groups."),
     answer("Perform a log-rank test to compare the survival distributions of the two groups.", correct = TRUE),
     answer("Perform a paired t-test for the two groups of patients."),
     allow_retry = TRUE, random_answer_order = TRUE
@@ -91,8 +90,8 @@ following variables:
 
 - `gender`: the sex indicator with values 'male' and 'female'.
 
-For the exercises below it will be rather useful to check the corresponding sections of the
-[Survival Analysis in R Companion](http://www.drizopoulos.com/courses/EMC/EP03_%20Survival%20Analysis%20in%20R%20Companion.html) that are given in the hints.
+For the exercises below it will be useful to check the corresponding sections of the
+[Survival Analysis in R Companion](http://www.drizopoulos.com/courses/EMC/EP03_%20Survival%20Analysis%20in%20R%20Companion.html) that are mentioned in the hints.
 
 ### Question 1
 
@@ -118,7 +117,7 @@ plot(fitKM)
 
 ### Question 2
 
-Calculate and plot the Breslow estimators of the survival functions for ddC and ddI, 
+Calculate and plot the Breslow estimator of the survival functions for ddC and ddI, 
 separately. Calculate also the estimates of the 50%, 60% and 70% percentiles of the 
 survival distribution with their 95% confidence intervals. Name the Breslow estimator 
 object `fitB`.
@@ -159,7 +158,7 @@ fitB <- survfit(Surv(Time, death) ~ drug, data = aids.id, type = "fleming-harrin
 ```
 
 ```{r P3-hint-1}
-# You will need to use function summary() and its argument 'times'
+# you will need to use function summary() and its argument 'times'
 # Check Section 2.1, Survival Analysis in R Companion
 ```
 
@@ -194,8 +193,8 @@ survdiff(Surv(Time, death) ~ drug, data = aids.id, rho = 1)
 
 ### Question 5
 
-Do the same for gender, i.e., calculate the Kaplan-Meier estimators of the 
-survival functions for males and females, and compare the results from the log-rank Peto 
+Do the same for gender, i.e., calculate the Kaplan-Meier estimator of the 
+survival functions for males and females, and compare the results from the log-rank and Peto 
 & Peto modified Gehan-Wilcoxon tests. Which test you should trust more in this case and why?
 
 ```{r P5, exercise=TRUE, exercise.lines = 10}

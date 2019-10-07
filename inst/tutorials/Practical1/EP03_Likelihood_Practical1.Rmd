@@ -8,16 +8,15 @@ runtime: shiny_prerendered
 
 ```{r setup, include=FALSE}
 library("learnr")
-data("pbc2.id", package = "JM")
+load("Data.RData")
 knitr::opts_chunk$set(echo = FALSE)
-
 ```
 
 
 ## Quiz
 
 The following questions test your knowledge in the introductory chapter of the principle
-of maximum likelihood, hypothesis testing and confidence intervals and regression models.
+of maximum likelihood, hypothesis testing, confidence intervals and regression models.
 
 ### Question 1
 
@@ -45,7 +44,7 @@ quiz(
 The maximum likelihood estimation methods gives us consistent estimates.
 ```{r Q2}
 quiz(
-  question("What does this mean?",
+  question("What this means?",
     answer("The esimates we obtain are unbiased."),
     answer("The estimates we obtain equal the true value in the population."),
     answer("The estimates we obtain comes closer to the true value in the population as the sample size increases.", correct = TRUE),
@@ -77,8 +76,8 @@ quiz(
     answer("With the Wald test we can only test one coefficient at a time."),
     answer("With the likelihood ratio test we can compare nested models.", correct = TRUE),
     answer("With the score test we fit the model under the null hypothesis, and hence we can only conclude if the null is correct."),
-    answer("With the Wald test we fit the model under the alternative hypothesis, and hence we can only conclude if the null hypothesis is correct."),
-    allow_retry = TRUE, random_answer_order = TRUE
+    answer("With the Wald test we fit the model under the alternative hypothesis, and hence we can only conclude if the alternative hypothesis is correct."),
+    allow_retry = TRUE, random_answer_order = FALSE
   )
 )
 ```
@@ -132,7 +131,7 @@ summary(fit1)
 ### Question 2
 
 Check the residuals of model `fit1` using the `plot()` method; before calling `plot()`,
-set `par(mfrow = c(2, 2))` in order to obtain the first basic plots in one figure.
+set `par(mfrow = c(2, 2))` in order to obtain the four basic plots in one figure.
 
 
 ```{r P2-setup}
@@ -145,7 +144,7 @@ fit1 <- lm(log(serBilir) ~  drug + age + sex + serChol + prothrombin,
 ```
 
 ```{r P2-hint-1}
-# Just first execute par(mfrow = c(2, 2)) and the plot() of your model from the 
+# Just first execute par(mfrow = c(2, 2)) and then use plot() in the model from the 
 # previous question
 ```
 ```{r P2-hint-2}
@@ -166,10 +165,10 @@ interpret the results. Name the fitted model `fit2`.
 ```
 
 ```{r P3-hint-1}
-# We will actually need to include the interaction terms between 'sex' and each on of
+# We will actually need to include the interaction terms between 'sex' and each one of
 # 'age', 'serChol' and 'prothrombin'
 
-# An interaction term between two variables is included using the ':', e.g., 'sex:age'
+# An interaction term between two variables is included using the ':' symbol, e.g., 'sex:age'
 ```
 ```{r P3-hint-2}
 # The code is:
@@ -177,8 +176,8 @@ fit2 <- lm(log(serBilir) ~  drug + age + sex + serChol + prothrombin +
                sex:age + sex:serChol + sex:prothrombin, 
           data = pbc2.id)
 
-# To write exactly the same model but in a shorter syntax, we can use the '*'.
-# The include both the main effects and interaction terms between the two variables.
+# To write exactly the same model but in a shorter syntax, we can use the '*' symbol
+# This symbol includes both the main effects and interaction terms between the two variables.
 # Hence, a shorter code is:
 fit2 <- lm(log(serBilir) ~  drug + sex * (age + serChol + prothrombin), 
           data = pbc2.id)
@@ -188,8 +187,8 @@ summary(fit2)
 
 ### Question 4
 
-We would like to statistically test whether the extra interaction terms really improve the
-fit of the model. Using an F-test (the analogues likelihood ratio test for linear 
+We would like to statistically test whether the extra interaction terms improve the
+fit of the model. Using an F-test (the analogous of the likelihood ratio test for linear 
 regression models), compare the interaction model `fit2` with the additive model `fit1`. 
 In R this is done using the `anova()` function.
 
@@ -215,7 +214,7 @@ anova(fit1, fit2)
 ### Question 5
 
 Given that the F-test suggests that some of the interaction terms are significant, we 
-could proceed to look whether we need all of them or some of them. To find these, we could
+proceed to see which of the interactions terms seem to improve the model. To find these, we could
 directly look at the individual p-values from the `summary()` output of the last model 
 `fit2`. However, one issue is that these p-values are not corrected for multiple testing. 
 Using the `p.adjust()` function obtain the adjusted p-values.
@@ -246,7 +245,7 @@ coef(summ_fit2)
 ```
 ```{r P5-hint-5}
 # Hence, the p-values are in the 4th (last) column of the table. Extract the
-# p-values of the interaction tersms from the table using the '[' indexing
+# p-values of the interaction tersms from the table using the '[' for indexing
 ```
 ```{r P5-hint-6}
 # The code is:
@@ -263,7 +262,7 @@ p.adjust(coef(summ_fit2)[7:9, 4])
 ### Question 6
 
 In a second analysis, the researchers are interested in studying the relationship between
-the natural logarithm of serum bilirubin and serum cholesterol corrected for age and sex.
+the natural logarithm of serum bilirubin and serum cholesterol, corrected for age and sex.
 It is believed that the relationship may be nonlinear. Use a 3rd degree polynomial of 
 serum cholesterol to explore this. Name the fitted model `fit1`.
 
@@ -292,9 +291,9 @@ summary(fit1)
 
 ### Question 7
 
-Investigate whether the relationship is truly nonlinear but first fitting the model that 
+Investigate whether the relationship is truly nonlinear by first fitting the model that 
 assumes linearity (null hypothesis), and following comparing this model with the previous 
-model `fit1` (alternative hypothesis) using an F-test and the `anova()` function.
+model `fit1` (alternative hypothesis) using an F-test via the `anova()` function.
 
 ```{r P7-setup}
 fit1 <- lm(log(serBilir) ~ poly(serChol, 3) + age + sex, 

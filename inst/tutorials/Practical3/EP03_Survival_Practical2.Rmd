@@ -10,18 +10,16 @@ runtime: shiny_prerendered
 library("learnr")
 library("survival")
 library("lattice")
-data("lung", package = "survival")
 lung$sex <- factor(lung$sex, labels = c("male", "female"))
 lung <- with(lung, lung[complete.cases(time, status, sex, age, ph.karno), ])
 knitr::opts_chunk$set(echo = FALSE)
-
 ```
 
 
 ## Quiz
 
-The following questions test your knowledge in the accelerated failure time models 
-presented in Chapter 4.
+The following questions test your knowledge on the framework of accelerated failure time 
+models presented in Chapter 4.
 
 ### Question 1
 
@@ -45,8 +43,8 @@ quiz(
 ```{r Q2}
 quiz(
   question("With regard to the distribution of the error terms in AFT models, which of the following statements is correct?",
-    answer("The choice for the distribution of the error terms will not affect the coefficients' estimates."),
-    answer("The choice for the distribution of the error terms minimally affects the coefficients' estimates."),
+    answer("The choice of the distribution of the error terms will not affect the coefficients' estimates."),
+    answer("The choice of the distribution of the error terms minimally affects the coefficients' estimates."),
     answer("Without fitting the corresponding AFT models, we cannot tell how much the choice of the distribution will affect the coefficients' estimates.", correct = TRUE),
     answer("None of the above."),
     allow_retry = TRUE, random_answer_order = FALSE
@@ -73,9 +71,10 @@ quiz(
 
 ```{r Q4}
 quiz(
-  question("Which of the following statments is a requirement in order to compare two AFT models with a likelihood ratio test (more than one correct possible)?",
+  question("Which of the following are requirements in order to compare two AFT models with a likelihood ratio test (more than one correct possible)?",
     answer("The models need to be nested (one is a special case of the other).", correct = TRUE),
     answer("The models need to be fitted with the same distribution for the error terms.", correct = TRUE),
+    answer("The models need to be fitted on the same dataset.", correct = TRUE),
     answer("The models need to contain only categorical covariates."),
     answer("The models need to contain only continuous covariates."),
     answer("The models need to contain both categorical and continuous covariates."),
@@ -87,10 +86,10 @@ quiz(
 ### Question 5
 
 In a study investigating potential risk factors for the expected survival time of 
-prostate cancer patients a team of researchers has fitted an accelerated failure time model
+prostate cancer patients, a team of researchers has fitted an accelerated failure time model
 assuming a normal distribution for the error terms. The team members have some conflicting 
-ideas on how to check the normality assumption and they come to you for advice. Below you
-find some of their ideas to check this assumption.
+ideas on how to check the normality assumption, and they have come to you for advice. 
+Below you find some of their ideas to check this assumption.
 
 ```{r Q5}
 quiz(
@@ -123,7 +122,7 @@ From this data set we will use the following variables:
 
 - `sex`: the sex indicator with values 'male' and 'female'.
 
-For the exercises below it will be rather useful to check the corresponding sections of the
+For the exercises below it will be useful to check the corresponding sections of the
 [Survival Analysis in R Companion](http://www.drizopoulos.com/courses/EMC/EP03_%20Survival%20Analysis%20in%20R%20Companion.html) that are given in the hints.
 
 ### Question 1
@@ -176,21 +175,21 @@ fit1 <- survreg(Surv(time, status) ~ sex * (age + ph.karno), data = lung,
 ```
 
 ```{r P2-hint-2}
-# the code is
+# The code is
 fit2 <- survreg(Surv(time, status) ~ age + ph.karno, data = lung)
 
 anova(fit2, fit1)
 ```
 
 ```{r P2-hint-3}
-# for the 2nd question we want to test the interaction terms => Go again in the full 
+# For the 2nd question we want to test the interaction terms => Return in the full 
 # model (i.e., the model under the alternative hypothesis) and remove the interactions;
 
 # then use the anova() function to compute the corresponding LRT.
 ```
 
 ```{r P2-hint-4}
-# the code is
+# The code is
 fit3 <- survreg(Surv(time, status) ~ sex + age + ph.karno, data = lung)
 
 anova(fit3, fit1)
@@ -198,7 +197,7 @@ anova(fit3, fit1)
 
 ### Question 3
 
-For the final model `fit3` obtained in Question 2 create an effects plot depicting how the 
+For the final model `fit3` obtained in Question 2 create an effect plot depicting how the 
 average failure time changes with increasing values of `ph.karno`, for the median age.
 
 ```{r P3-setup}
@@ -212,7 +211,7 @@ fit3 <- survreg(Surv(time, status) ~ sex + age + ph.karno, data = lung)
 ```{r P3-hint-1}
 # Check the example in slides 145-148, and Section 3.2, Survival Analysis in R Companion
 
-# First calculate what is the median age, and what the observed range of 'ph.karno' in
+# First calculate what is the median age, and what is the observed range of 'ph.karno' in
 # our data (for the latter use function range())
 ```
 
@@ -234,7 +233,7 @@ with(lung, range(ph.karno))
 ```
 
 ```{r P3-hint-4}
-# the code is (this code just creates the dataset and does not create any output)
+# The code is (this code just creates the dataset and does not create any output)
 ND <- expand.grid(sex = c("male", "female"), age = 63, ph.karno = seq(50, 100, length.out = 50))
 
 ```
@@ -244,7 +243,7 @@ ND <- expand.grid(sex = c("male", "female"), age = 63, ph.karno = seq(50, 100, l
 ```
 
 ```{r P3-hint-6}
-# the code is
+# The code is
 prs <- predict(fit3, ND, se.fit = TRUE, type = "lp")
 ND$pred <- prs[[1]]
 ND$se <- prs[[2]]
@@ -252,18 +251,18 @@ ND$lo <- exp(ND$pred - 1.96 * ND$se)
 ND$up <- exp(ND$pred + 1.96 * ND$se)
 ND$pred <- exp(ND$pred)
 
-# the first lines of ND are
+# The first lines of ND are
 head(ND)
 ```
 
 ```{r P3-hint-7}
 # Produce the plot using the same code as in slide 148.
-# Note, you will need to adapt a bit this code, namely
+# Note, you will need to adapt a bit this code, namely,
 # you will need to use 'ph.karno' instead of 'age', and 'sex' instead of 'drug'
 ```
 
 ```{r P3-hint-8}
-# the code is
+# The code is
 xyplot(pred + lo + up ~ ph.karno | sex, data = ND, type = "l", 
     lty = c(1, 2, 2), col = c(2, 1, 1), lwd = 3, 
     xlab = "Karnofsky Performance Score", ylab = "Survival Time")
@@ -285,13 +284,13 @@ fit3 <- survreg(Surv(time, status) ~ sex + age + ph.karno, data = lung)
 ```{r P4-hint-1}
 # Check the example in slides 168-169, and Section 3.4, Survival Analysis in R Companion
 
-# This is for model 'fit3' that we have been using so far. 
-# First extract the fitted values, then calculate the residuals and then 
+# For model 'fit3' that we have selected in the previous question, 
+# first extract the fitted values, then calculate the residuals, and then 
 # calculate the Kaplan-Meier estimator of these residuals.
 ```
 
 ```{r P4-hint-2}
-# the code is (this code just calculates the residuals and does not create any output):
+# The code is (this code just calculates the residuals and does not create any output):
 fits <- fit3$linear.predictors
 resids <- (fit3$y[, 1] - fits) / fit3$scale
 resKM <- survfit(Surv(resids, status) ~ 1, data = lung)
