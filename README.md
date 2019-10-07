@@ -1,4 +1,4 @@
-# Biostatistical Methods II: Classical Regression Models - Software Practicals
+# Biostatistical Methods II: Classical Regression Models - Software Practicals Survival
 This repository contains [learnr](https://rstudio.github.io/learnr/) tutorials for the course 
 [**Biostatistical Methods II: Classical Regression Models**](http://www.nihes.com/education/?ct=EP03). 
 The app requires [R](https://cran.r-project.org/) (version >= 3.6.1) and the following 
