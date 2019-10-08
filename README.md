@@ -16,11 +16,11 @@ install.packages(c("survival", "lattice", "learnr"), dependencies = TRUE)
 
 The tutorials can be loaded with the following commands:
 ```r
-load_practical("Likelihood")
-load_practical("Basic_Survival")
-load_practical("AFT_Models")
-load_practical("Cox_Models")
-load_practical("Cox_Extensions")
+EP03survival::load_practical("Likelihood")
+EP03survival::load_practical("Basic_Survival")
+EP03survival::load_practical("AFT_Models")
+EP03survival::load_practical("Cox_Models")
+EP03survival::load_practical("Cox_Extensions")
 ```
 
 This package can be installed by first installing package [**devtools**](https://cran.r-project.org/package=devtools), and the executing the following command:
