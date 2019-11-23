@@ -105,7 +105,7 @@ following variables:
 
 ### Question 1
 
-We want to see how the log-transformed serum bilirubin time is related with the rest of 
+We want to see how the log-transformed serum bilirubin is related with the rest of 
 the variables. Start by fitting an additive linear regression model, using function 
 `lm()`, and interpret the results you obtain from the `summary()` method. Name the fitted 
 model `fit1`.

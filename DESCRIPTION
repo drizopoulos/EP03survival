@@ -1,8 +1,8 @@
 Package: EP03survival
 Type: Package
 Title: Software Tutorials for the Survival Part of the Biostatistical Methods II Course
-Version: 0.2.0
-Date: 2019-10-07
+Version: 0.3.0
+Date: 2019-11-23
 Author: Dimitris Rizopoulos <d.rizopoulos@erasmusmc.nl>
 Maintainer: Dimitris Rizopoulos <d.rizopoulos@erasmusmc.nl>
 Description: Contains learnr tutorials for the software practicals of the EP03 course.
