@@ -417,7 +417,8 @@ and test whether this hypothesis is supported by the data for each of the two pr
 ```{r P4-setup}
 lung$ph.ecog2 <- lung$ph.ecog
 lung$ph.ecog2[lung$ph.ecog2 > 0] <- 1
-fit6 <- coxph(Surv(time, status) ~ sex + age + ph.karno + strata(ph.ecog2), data = lung)
+fit_addStr <- coxph(Surv(time, status) ~ sex + age + ph.karno + strata(ph.ecog2), 
+                 data = lung)
 ```
 ```{r P4, exercise=TRUE, exercise.lines = 15}
 
