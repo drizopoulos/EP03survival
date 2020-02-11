@@ -126,10 +126,9 @@ For the exercises below it will be useful to check the corresponding sections of
 [Survival Analysis in R Companion](http://www.drizopoulos.com/courses/EMC/EP03_%20Survival%20Analysis%20in%20R%20Companion.html) that are given in the hints.
 
 If you decide to work directly in R and not in this online tutorial, then you need to first run the following lines of code:
-```{r, eval = FALSE}
+```
 library("survival")
 library("lattice")
-library("splines")
 data("lung", package = "survival")
 lung$sex <- factor(lung$sex, labels = c("male", "female"))
 lung <- with(lung, lung[complete.cases(time, status, sex, age, ph.karno), ])
