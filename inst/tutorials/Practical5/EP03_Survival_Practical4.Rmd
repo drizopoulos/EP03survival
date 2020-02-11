@@ -130,22 +130,33 @@ From this data set we will use the following variables:
 For the exercises below it will be useful to check the corresponding sections of the
 [Survival Analysis in R Companion](http://www.drizopoulos.com/courses/EMC/EP03_%20Survival%20Analysis%20in%20R%20Companion.html) that are given in the hints.
 
+If you decide to work directly in R and not in this online tutorial, then you need to first run the following lines of code:
+```{r, eval = FALSE}
+library("survival")
+library("lattice")
+library("splines")
+data("lung", package = "survival")
+lung$sex <- factor(lung$sex, labels = c("male", "female"))
+lung <- with(lung, lung[complete.cases(time, status, sex, age, ph.karno), ])
+```
+
 ### Question 1
 
-Our initial hypothesis is that the time-to-death is affected by `sex`, `age` and 
-`ph.karno`. In addition, the physicians believe that the effect of `ph.karno` and `age` 
-may be nonlinear in the log-hazard scale. Moreover, the (possibly nonlinear -- model using
-natural cubic splines with 3 degrees of freedom) effects of  `age` and `ph.karno` on the 
-log-hazard scale are not the same for males and females. Transform this initial hypothesis
+Our initial hypothesis is that the time-to-death is affected by `sex`, `age` and`ph.karno`. Also, the physicians believe that the effect of `ph.karno` and `age` may be nonlinear in the log-hazard scale. Moreover, the (possibly nonlinear -- model using natural cubic splines with 3 degrees of freedom) effects of  `age` and `ph.karno` on the log-hazard scale are not the same for males and females. Transform this initial hypothesis
 into a suitable Cox PH model. Name the fitted model `fit1`.
 
-The aim here is to do a realistic analysis of a survival dataset with a Cox PH model. Hence,
+The aim here is to do a realistic analysis of a survival dataset with a Cox PH model. This involves the following steps:
 
-a. Start by checking if the interaction effects can be dropped using a likelihood ratio test.
+a. We first translate our initial hypothesis into a full model that contains all terms of interest. This includes all covariates we are interested in and also possibly nonlinear and interaction terms.
 
-b. Similarly check if the nonlinear effects can be dropped using a likelihood ratio test.
+b. We then first test the important assumption behind the model. In the case of the Cox model that is the proportional hazards assumption. (In the case of an AFT model that is the distribution of the error terms). We need to do that first and rectify any problems with these assumptions **before** proceeding to simplify the model using hypothesis testing.
 
-c. For the final model check the PH assumption for the terms in the model.
+c. Then we continue by performing an omnibus test for all interaction terms in the model and see if we can drop them. Typically, using a p-value threshold higher than 5%, e.g., we can use 15%. This is to ensure that we do not miss any potentially interesting interactions. If the test suggests that some interactions may seem to improve the fit of the model, then we can proceed to see which interaction terms specifically achieve that. We test then each interaction separately, and at the end we can correct the p-values for multiple testing. Hence, at the final stage of this step we will know which interaction terms we will keep in the model.
+
+d. We do the same for the nonlinear terms. Namely, first, we start by the omnibus test, and if the p-value is smaller than 15%, we are going to see which nonlinear terms we need. Hence, at the final stage of this step, we will know our final model. Note, that unless the aim is to do prediction, it is not advisable to remove non statistically significant covariates from the final model.
+
+e. Finally, we interpret the results using the table of coefficients and effect plots if necessary.
+ 
 
 ```{r P1, exercise=TRUE, exercise.lines = 20}
 
@@ -159,139 +170,140 @@ c. For the final model check the PH assumption for the terms in the model.
 ```
 ```{r P1-hint-2}
 # The code is (this code only fits the model and does not produce any output):
-fit1 <- coxph(Surv(time, status) ~ sex * (ns(age, 3) + ns(ph.karno, 3)), 
-              data = lung)
+fit_full <- coxph(Surv(time, status) ~ sex * (ns(age, 3) + ns(ph.karno, 3)), 
+                  data = lung)
 ```
 
 ```{r P1-hint-3}
-# Fit the Cox PH model without the interaction effects, and do the LRT
-# using anova()
-```
-```{r P1-hint-4}
-# The code is
-fit2 <- coxph(Surv(time, status) ~ sex + ns(age, 3) + ns(ph.karno, 3), 
-              data = lung)
-
-anova(fit2, fit1)
-```
-
-```{r P1-hint-5}
-# Fit the Cox PH model without the nonlinear effects, and do the LRT.
-# Compare this model versus the full model that you initially fitted
-```
-```{r P1-hint-6}
-# The code is
-fit3 <- coxph(Surv(time, status) ~ sex + age + ph.karno, 
-              data = lung)
-
-anova(fit3, fit2)
-```
-
-```{r P1-hint-7}
-# Based on the results of the previous two tests decide how to simplify the model.
-
-# Fit the final model fit4
-```
-```{r P1-hint-8}
-# The final model is (this code only fits the model and does not produce any output):
-fit4 <- coxph(Surv(time, status) ~ sex + age + ph.karno, 
-              data = lung)
-```
-
-```{r P1-hint-9}
 # Check the PH assumption using function cox.zph() - check the code in slide 240, and 
 # Section 4.4, Survival Analysis in R Companion
 
-# Produce the plot separately per variables and add the coefficient from the final Cox 
-# model (i.e., the PH assumption). We want to see if the red line is a good 
-# approximation of the black one. Check Section 4.4, Survival Analysis in R Companion
+# Produce the plot separately per term. We want to see if the line is horizontal. 
+# Check Section 4.4, Survival Analysis in R Companion
 ```
-```{r P1-hint-10}
+```{r P1-hint-4}
 # The code is
-check_PH <- cox.zph(fit4)
-
-plot(check_PH, var = 1)
-abline(h = coef(fit4)[1], col = "red", lwd = 2)
-
-plot(check_PH, var = 2)
-abline(h = coef(fit4)[2], col = "red", lwd = 2)
-
-plot(check_PH, var = 3)
-abline(h = coef(fit4)[3], col = "red", lwd = 2)
+check_PH <- cox.zph(fit_full)
+check_PH
+plot(check_PH)
 ```
 
+```{r P1-hint-5}
+# We did not observe any serious violations of PH. Hence, we proceed with the
+# omnibus test for all interaction terms.
+# Fit the Cox PH model without the interaction effects, and do the LRT
+# using anova()
+```
+```{r P1-hint-6}
+# The code is
+fit_noInt <- coxph(Surv(time, status) ~ sex + ns(age, 3) + ns(ph.karno, 3), 
+                   data = lung)
+
+anova(fit_noInt, fit_full)
+```
+```{r P1-hint-7}
+# The p-value is smaller than 15%. Hence, we will proceed to see which interaction 
+# terms seem to play a role.
+# We start by testing the interaction between sex and nonlinear age. To do that we need
+# to fit the model that excludes this interaction term and compare it with an LRT with 
+# the full model, i.e.,
+fit_noInt_Age <- coxph(Surv(time, status) ~ sex * ns(ph.karno, 3) + ns(age, 3), 
+                       data = lung)
+
+aov_Int_Age <- anova(fit_noInt_Age, fit_full)
+aov_Int_Age
+```
+```{r P1-hint-8}
+# We observe that the interaction term between sex and age does not seem to improve the 
+# fit of the model. We proceed to see if the interaction term between sex and 
+# ph.karno does, i.e.,
+fit_noInt_Karno <- coxph(Surv(time, status) ~ sex * ns(age, 3) + ns(ph.karno, 3), 
+                       data = lung)
+
+aov_Int_Karno <- anova(fit_noInt_Karno, fit_full)
+aov_Int_Karno
+```
+```{r P1-hint-9}
+# The p-value is significant at 5% level, but we have not corrected it yet for
+# multiple testing. We do that now using the p.adjust() function:
+pvals <- c(aov_Int_Age$`P(>|Chi|)`[2], aov_Int_Karno$`P(>|Chi|)`[2])
+p.adjust(pvals)
+```
+
+```{r P1-hint-10}
+# Hence, from the two interaction we only keep the one between sex and ph.karno
+
+# We proceed to do exactly the same for nonlinear terms. We first start by the
+# omnibus test for all nonlinear terms, i.e.,
+fit_noSplines <- coxph(Surv(time, status) ~ sex * (age + ph.karno), 
+                       data = lung)
+
+
+anova(fit_noSplines, fit_full)
+```
 ```{r P1-hint-11}
-# We observe that the PH assumptions does not seem to be satisfied for 'age' and
-# 'ph.karno'.
+# The p-value is smaller than 15%. Hence, we will proceed to see which nonlinear 
+# terms seem to play a role.
+# We start by testing the nonlinear for age. To do that we need to fit the model that 
+# assumes that the effect of age is linear, compare it with an LRT with 
+# the full model, i.e.,
+fit_noSplines_Age <- coxph(Surv(time, status) ~ sex * (age + ns(ph.karno, 3)), 
+                           data = lung)
 
-# One solution discussed in slide 243 is to partion the time axis. From oberve that 
-# from the two variables, for 'age' the PH seems to be more strongly violated. In addition,
-# from the plot we observe that there are potentially three periods in which 
-# the coefficient of age seems more constant, namely in the first 100 days, then 
-# from 100 to 270 days, and finally from 270 days until the end.
-# Hence, we decide to create a partion of the complete dataset in these three pieces.
-# Then we will fit a Cox model that will allow for different coefficients of 'age' and
-# 'ph.karno' in the three partitions.
-
-# We start by creating the partioned dataset. This can be easily done using the function
-# survSplit() from the survival package. Check the help file and the example for this 
-# function. We will need to give the formula which is the same as the formula of model
-# 'fit4', provide the original 'lung' data in the 'data' argument, then define in the 'cut' 
-# argument the partition, i.e., give the vector c(100, 270), and finaly also define the 
-# name of the variable that will denote the different pieces of the data; name this 
-# variable 'time_group'
-
-# Create the partioned dataset using survSplit() as described above, and name it 'lung2'.
-# Check Section 5.2.1, Survival Analysis in R Companion
+aov_Spl_Age <- anova(fit_noSplines_Age, fit_full)
+aov_Spl_Age
 ```
 ```{r P1-hint-12}
-# The code is:
-lung2 <- survSplit(Surv(time, status) ~ sex + age + ph.karno, data = lung,
-                   cut = c(100, 270), episode = "time_group")
-```
+# We observe that the nonlinear terms for age do not seem to improve the 
+# fit of the model. We proceed to see if the nonlinear terms for ph.karno do, i.e.,
+fit_noSplines_Karno <- coxph(Surv(time, status) ~ sex * (ns(age, 3) + ph.karno), 
+                           data = lung)
 
+aov_Spl_Karno <- anova(fit_noSplines_Karno, fit_full)
+aov_Spl_Karno
+```
 ```{r P1-hint-13}
-# Fit a Cox model in the lung2 dataset that includes as stratifying factor the 
-# 'time_group' variable and its interaction with 'age' and 'ph.karno'.
-# Name the fitted model 'fit5'
+# The p-value is significant at 5% level, but we have not corrected it yet for
+# multiple testing. We do that now using the p.adjust() function:
+pvals <- c(aov_Spl_Age$`P(>|Chi|)`[2], aov_Spl_Karno$`P(>|Chi|)`[2])
+p.adjust(pvals)
 ```
 ```{r P1-hint-14}
-# The code is:
-fit5 <- coxph(Surv(tstart, time, status) ~ sex + (age + ph.karno):strata(time_group),
-              data = lung2)
+# We observe that the nonlinear terms for ph.karno are no longer significant at 5%. 
+# But we still opt to include them in the model to explore in more detail how 
+# ph.karno affects the risk. We will see from the effect plot better how the 
+# relationship looks like.
+
+# Hence, our final model is:
+fit_final <- coxph(Surv(time, status) ~ sex * ns(ph.karno, 3) + age, 
+                   data = lung)
 ```
 
 ```{r P1-hint-15}
-# Check the PH assumption, as before using cox.zph(), for the first model.
-# Do also the plots.
+# The summary of the final model gives:
+summary(fit_final)
 ```
+
 ```{r P1-hint-16}
-# The code is:
+# From the table of coefficients we cannot interpret the ones which contain
+# nonlinear terms. But we can interpret the rest, e.g., the coefficient of age
 
-# First we define a helper function to do the plot and add the horizontal line
-plt_zph <- function (object, var) {
-    plot(cox.zph(object), var = var)
-    abline(h = coef(object)[var], col = "red", lwd = 2)
-}
+# To depict how the sex and ph.karno affect the risk of death, we use an effect plot:
+ND <- with(lung, expand.grid(sex = levels(sex),
+                             ph.karno = seq(60, 100, length = 25),
+                             age = median(age)
+))
 
-# check PH for sex
-plt_zph(fit5, var = 1)
+prs <- predict(fit_final, newdata = ND, type = "lp", se.fit = TRUE)
+ND$pred <- prs[[1]]
+ND$se <- prs[[2]]
+ND$lo <- ND$pred - 1.96 * ND$se
+ND$up <- ND$pred + 1.96 * ND$se
 
-# check PH for age
-opar <- par(no.readonly = TRUE, mfrow = c(2, 2), oma = c(3, 3, 2, 3), 
-            mar = c(2, 0, 0, 0), mgp = c(3, 0.4, 0), tcl = -0.25)
-plt_zph(fit5, var = 2)
-plt_zph(fit5, var = 3)
-plt_zph(fit5, var = 4)
-par(opar)
-
-# check PH for ph.karno
-opar <- par(no.readonly = TRUE, mfrow = c(2, 2), oma = c(3, 3, 2, 3), 
-            mar = c(2, 0, 0, 0), mgp = c(3, 0.4, 0), tcl = -0.25)
-plt_zph(fit5, var = 5)
-plt_zph(fit5, var = 6)
-plt_zph(fit5, var = 7)
-par(opar)
+xyplot(exp(pred) + exp(lo) + exp(up) ~ ph.karno | sex, data = ND,
+       type = "l", lty = c(1, 2, 2), lwd = 2, col = "black",
+       abline = list(h = 1, lty = 2, lwd = 2, col = "red"),
+       xlab = "PH Karno", ylab = "Hazard Ratio")
 ```
 
 ### Question 2
@@ -307,12 +319,8 @@ b. Plot the corresponding survival curves.
 c. What are the corresponding survival probabilities for 200, 400, 600 and 800 days?
 
 ```{r P2-setup}
-lung2 <- survSplit(Surv(time, status) ~ sex + age + ph.karno, data = lung,
-                   cut = c(100, 270), episode = "time_group")
-fit5 <- coxph(Surv(tstart, time, status) ~ sex + (age + ph.karno):strata(time_group),
-              data = lung2)
-
-summary(fit5)
+fit_final <- coxph(Surv(time, status) ~ sex * ns(ph.karno, 3) + age, 
+                   data = lung)
 ```
 
 ```{r P2, exercise=TRUE, exercise.lines = 20}
@@ -320,9 +328,6 @@ summary(fit5)
 ```
 
 ```{r P2-hint-1}
-# Remember that we work with the statified Cox model 'fit5' and the paritioned dataset
-# at 100 and 270 days.
-
 # First we need to define the dataset that contains the information of the type of 
 # patients for which we want to calculate the survival probabilities.
 
@@ -334,48 +339,32 @@ summary(fit5)
 ```
 ```{r P2-hint-2}
 # The code is (this code only creates the dataset and does not produce any output):
-ND <- with(lung, expand.grid(sex = levels(sex), age = median(age), 
-                             ph.karno = mean(ph.karno), time_group = 1:3))
+DD <- with(lung, expand.grid(sex = levels(sex), age = median(age), 
+                             ph.karno = mean(ph.karno)))
 ```
 
 ```{r P2-hint-3}
-# Calculate the survival probabilities using this dataset 'ND' and the statified Cox 
-# model 'fit5' using the survfit() function.
+# Calculate the survival probabilities using this dataset 'DD' and the final Cox 
+# model 'fit_final' using the survfit() function.
 ```
 ```{r P2-hint-4}
 # The code is:
-probs <- survfit(fit5, newdata = ND)
 
-probs
+sfit <- survfit(fit_final, newdata = DD)
 
-plot(probs)
+sfit
+plot(sfit, col = 1:2, lwd = 2)
+legend("topright", levels(DD$sex), lty = 1, col = 1:2, lwd = 2, bty = "n")
 ```
 
 ```{r P2-hint-5}
-# We want the survival probabilities at 200 days. For this we will need to use the second 
-# part of the patition from 100 to 270 days. 
-
-# Then using the summary() method and the 'times' argument.
+# obtain survival probabilies at specific follow-up times we use the summary()
+# method for 'sfit', and we specify the 'times' argument.
+# See Section 5.1, Survival Analysis in R Companion
 ```
 ```{r P2-hint-6}
 # The code is:
-probs_200 <- survfit(fit5, newdata = ND[ND$time_group == 2, ])
-
-summary(probs_200, times = 200)
-```
-
-
-```{r P2-hint-7}
-# Likewise to calculate the survival probabilities at 400, 600 and 800 days we need the
-# third part of the partition from 270 days to the end of the study.
-
-# Then using the summary() method and the 'times' argument.
-```
-```{r P2-hint-8}
-# The code is:
-probs_400 <- survfit(fit5, newdata = ND[ND$time_group == 3, ])
-
-summary(probs_400, times = c(400, 600, 800))
+summary(sfit, times = c(200, 400, 600, 800))
 ```
 
 ### Question 3
@@ -406,22 +395,23 @@ lung$ph.ecog2[lung$ph.ecog2 > 0] <- 1
 ```
 
 ```{r P3-hint-3}
-# First, we need to construct the 'ph.ecog2'. Start by setting the variable as a copy of
-# the original 'ph.ecog'. Then set the values of 'ph.ecog2' which are greater than 0 
-# equal to 1.
+# To account for the different baseline hazard for the levels of `ph.ecog2`
+# we need to stratify with this variable.
+# See Section 5.2, Survival Analysis in R Companion
 ```
 ```{r P3-hint-4}
 # The code is:
-fit6 <- coxph(Surv(time, status) ~ sex + age + ph.karno + strata(ph.ecog2), data = lung)
+fit_addStr <- coxph(Surv(time, status) ~ sex + age + ph.karno + strata(ph.ecog2), 
+                 data = lung)
 
-summary(fit6)
+summary(fit_addStr)
 ```
 
 ### Question 4
 
 The team of physicians of the North Central Cancer Treatment Group (who are responsible
 for the Lung study) believe that the effects of `sex`, `age` and `ph.karno` in the risk 
-of death are different for the two ECOG groups. Extend the model `fit6` of Q3 accordingly,
+of death are different for the two ECOG groups. Extend the model `fit_addStr` of Q3 accordingly,
 and test whether this hypothesis is supported by the data for each of the two predictors.
 
 ```{r P4-setup}
@@ -441,7 +431,7 @@ fit6 <- coxph(Surv(time, status) ~ sex + age + ph.karno + strata(ph.ecog2), data
 ```
 ```{r P4-hint-2}
 # The code is:
-fit7 <- coxph(Surv(time, status) ~ (sex + age + ph.karno) * strata(ph.ecog2), data = lung)
+fit_intStr <- coxph(Surv(time, status) ~ (sex + age + ph.karno) * strata(ph.ecog2), data = lung)
 
-anova(fit6, fit7)
+anova(fit_addStr, fit_intStr)
 ```
