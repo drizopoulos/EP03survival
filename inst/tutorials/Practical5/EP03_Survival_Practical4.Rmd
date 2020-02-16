@@ -158,7 +158,7 @@ d. We do the same for the nonlinear terms. Namely, first, we start by the omnibu
 e. Finally, we interpret the results using the table of coefficients and effect plots if necessary.
  
 
-```{r P1, exercise=TRUE, exercise.lines = 20}
+```{r P1, exercise=TRUE, exercise.lines = 30}
 
 ```
 
@@ -379,7 +379,7 @@ groups together the values 1-3. Then, fit an appropriate Cox model that takes th
 described above into account, and then interpret the results. Name the fitted model 
 `fit6`.
 
-```{r P3, exercise=TRUE, exercise.lines = 15}
+```{r P3, exercise = TRUE, exercise.lines = 15}
 
 ```
 
@@ -411,7 +411,7 @@ summary(fit_addStr)
 
 The team of physicians of the North Central Cancer Treatment Group (who are responsible
 for the Lung study) believe that the effects of `sex`, `age` and `ph.karno` in the risk 
-of death are different for the two ECOG groups. Extend the model `fit_addStr` of Q3 accordingly,
+of death are different for the two ECOG groups. Extend the model `fit_addStr` of Question 3 accordingly,
 and test whether this hypothesis is supported by the data for each of the two predictors.
 
 ```{r P4-setup}
