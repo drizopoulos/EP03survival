@@ -12,6 +12,7 @@ library("survival")
 library("lattice")
 lung$sex <- factor(lung$sex, labels = c("male", "female"))
 lung <- with(lung, lung[complete.cases(time, status, sex, age, ph.karno), ])
+knitr::opts_chunk$set(echo = FALSE)
 options(tutorial.exercise.timelimit = 1200)
 ```
 

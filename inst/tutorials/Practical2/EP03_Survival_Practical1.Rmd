@@ -10,6 +10,7 @@ runtime: shiny_prerendered
 library("learnr")
 library("survival")
 load("Data.RData")
+knitr::opts_chunk$set(echo = FALSE)
 options(tutorial.exercise.timelimit = 1200)
 ```
 

@@ -9,6 +9,7 @@ runtime: shiny_prerendered
 ```{r setup, include=FALSE}
 library("learnr")
 load("Data.RData")
+knitr::opts_chunk$set(echo = FALSE)
 options(tutorial.exercise.timelimit = 1200)
 ```
 

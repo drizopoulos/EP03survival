@@ -12,6 +12,7 @@ library("survival")
 library("lattice")
 library("splines")
 load("Data.RData")
+knitr::opts_chunk$set(echo = FALSE)
 options(tutorial.exercise.timelimit = 1200)
 ```
 
