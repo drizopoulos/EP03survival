@@ -122,6 +122,18 @@ $(document).ready(function () {
 <div id="section-question-1" class="section level3">
 <h3>Question 1</h3>
 <p>In a clinical study interest lies on the survival of HIV-infected patients after seroconversion. The Kaplan-Meier estimate at year 1 equals 0.88</p>
+<pre class="r"><code>quiz(
+  question(&quot;Which of the following statements are correct (more than one correct is possible)?&quot;,
+    answer(&quot;Given that a patient is alive at year 1, the instantaneous risk of death just after year 1 is 0.88.&quot;),
+    answer(&quot;For the target population and on average we expect 88% of the patients to live more than 1 year.&quot;, correct = TRUE),
+    answer(&quot;The cumulative risk of death at year 1 equals 0.88.&quot;),
+    answer(&quot;The estimated survival function at year 1 equals 0.88, meaning that we expect 12% of the patients to die within 1 year.&quot;, correct = TRUE),
+    answer(&quot;The estimated survival function at year 1 equals 0.12, meaning that we expect 12% of the patients to live more than 1 year.&quot;),
+    answer(&quot;The cumulative distribution function equals 0.12.&quot;, correct = TRUE),
+    answer(&quot;The cumulative distribution function equals 0.88.&quot;),
+    allow_retry = TRUE, random_answer_order = TRUE
+  )
+)</code></pre>
 <p><div class="panel-heading tutorial-quiz-title">Quiz</div><div class="panel panel-default">
 <div data-label="Q1-1" class="tutorial-question panel-body">
 <div id="Q1-1-answer_container" class="shiny-html-output"></div>
@@ -134,6 +146,15 @@ $(document).ready(function () {
 <div id="section-question-2" class="section level3">
 <h3>Question 2</h3>
 <p>A study has been designed to investigate whether a new therapy improves the survival rates of advanced cancer patients. You have at hand the survival times of the two groups of patients, namely, the patients taking the new treatment and the patients with the standard treatment.</p>
+<pre class="r"><code>quiz(
+  question(&quot;Which of the following types of analysis would you follow to investigate if the new treatment works?&quot;,
+    answer(&quot;Perform a two-sample t-test for the two groups of patients to test if the mean survival time in the new treatment group is greater than the mean survival time in the standard treatment group.&quot;),
+    answer(&quot;First check if the data are normally distributed; if yes, perform a two-sample t-test, otherwise perform a two-sample Wilcoxon test to test differences in the medians between the two treatment groups.&quot;),
+    answer(&quot;Perform a log-rank test to compare the survival distributions of the two groups.&quot;, correct = TRUE),
+    answer(&quot;Perform a paired t-test for the two groups of patients.&quot;),
+    allow_retry = TRUE, random_answer_order = TRUE
+  )
+)</code></pre>
 <p><div class="panel-heading tutorial-quiz-title">Quiz</div><div class="panel panel-default">
 <div data-label="Q2-1" class="tutorial-question panel-body">
 <div id="Q2-1-answer_container" class="shiny-html-output"></div>
@@ -146,6 +167,15 @@ $(document).ready(function () {
 <div id="section-question-3" class="section level3">
 <h3>Question 3</h3>
 <p>A study has been designed to investigate whether a new therapy improves the survival rates of advanced cancer patients. You have at hand the survival times of the two groups of patients, namely, the patients taking the new treatment and the patients with the standard treatment.</p>
+<pre class="r"><code>quiz(
+  question(&quot;Which of the following types of analysis would you follow to investigate if the new treatment works?&quot;,
+    answer(&quot;Perform a log-rank test to compare the survival distributions of the two groups.&quot;),
+    answer(&quot;Perform a Peto and Peto Gehan-Wilcoxon test to compare the survival distributions of the two groups.&quot;),
+    answer(&quot;Check graphically if the proportional hazards assumption is satisfied. If it seems to be satisfied, then use the log rank test.&quot;, correct = TRUE),
+    answer(&quot;Check graphically if the proportional hazards assumption is satisfied. If it seems to be satisfied, then use the Peto and Peto Gehan-Wilcoxon test.&quot;),
+    allow_retry = TRUE, random_answer_order = TRUE
+  )
+)</code></pre>
 <p><div class="panel-heading tutorial-quiz-title">Quiz</div><div class="panel panel-default">
 <div data-label="Q3-1" class="tutorial-question panel-body">
 <div id="Q3-1-answer_container" class="shiny-html-output"></div>
@@ -189,7 +219,7 @@ plot(fitKM)</code></pre>
 <div id="section-question-2-1" class="section level3">
 <h3>Question 2</h3>
 <p>Calculate and plot the Breslow estimator of the survival functions for ddC and ddI, separately. Calculate also the estimates of the 50%, 60% and 70% percentiles of the survival distribution with their 95% confidence intervals. Name the Breslow estimator object <code>fitB</code>.</p>
-<div class="tutorial-exercise" data-label="P2" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="10">
+<div class="tutorial-exercise" data-label="P2" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="15">
 <script type="application/json" data-opts-chunk="1">{"fig.width":6.5,"fig.height":4,"fig.retina":2,"fig.align":"default","fig.keep":"high","fig.show":"asis","out.width":624,"warning":true,"error":false,"message":true,"exercise.df_print":"paged","exercise.checker":"NULL"}</script>
 </div>
 <div class="tutorial-exercise-support" data-label="P2-hint-1" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
@@ -215,7 +245,7 @@ quantile(fitB, 1 - c(0.5, 0.6, 0.7))</code></pre>
 <div class="tutorial-exercise-support" data-label="P3-setup" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
 <pre class="text"><code>fitB &lt;- survfit(Surv(Time, death) ~ drug, data = aids.id, type = &quot;fleming-harrington&quot;)</code></pre>
 </div>
-<div class="tutorial-exercise" data-label="P3" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="10">
+<div class="tutorial-exercise" data-label="P3" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="15">
 <script type="application/json" data-opts-chunk="1">{"fig.width":6.5,"fig.height":4,"fig.retina":2,"fig.align":"default","fig.keep":"high","fig.show":"asis","out.width":624,"warning":true,"error":false,"message":true,"exercise.df_print":"paged","exercise.checker":"NULL"}</script>
 </div>
 <div class="tutorial-exercise-support" data-label="P3-hint-1" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
@@ -230,7 +260,7 @@ summary(fitB, times = c(8, 10))</code></pre>
 <div id="section-question-4" class="section level3">
 <h3>Question 4</h3>
 <p>Compare with the log-rank Peto &amp; Peto modified Gehan-Wilcoxon tests if the survival curves for the two treatment groups differ statistically significantly. <strong>Before</strong> doing the analysis, which of the two tests you expect to yield the smaller p-value and why?</p>
-<div class="tutorial-exercise" data-label="P4" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="10">
+<div class="tutorial-exercise" data-label="P4" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="15">
 <script type="application/json" data-opts-chunk="1">{"fig.width":6.5,"fig.height":4,"fig.retina":2,"fig.align":"default","fig.keep":"high","fig.show":"asis","out.width":624,"warning":true,"error":false,"message":true,"exercise.df_print":"paged","exercise.checker":"NULL"}</script>
 </div>
 <div class="tutorial-exercise-support" data-label="P4-hint-1" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
@@ -277,7 +307,7 @@ survdiff(Surv(Time, death) ~ gender, data = aids.id, rho = 1)</code></pre>
 library("learnr")
 library("survival")
 load("Data.RData")
-knitr::opts_chunk$set(echo = FALSE)
+options(tutorial.exercise.timelimit = 1200)
 </script>
  
 <script type="application/shiny-prerendered" data-context="server">
@@ -343,7 +373,7 @@ output$`tutorial-exercise-P5-output` <- renderUI({
 <!--/html_preserve-->
 <!--html_preserve-->
 <script type="application/shiny-prerendered" data-context="execution_dependencies">
-{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["packages"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["packages","version"]},"class":{"type":"character","attributes":{},"value":["data.frame"]},"row.names":{"type":"integer","attributes":{},"value":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43]}},"value":[{"type":"character","attributes":{},"value":["backports","base","checkmate","compiler","datasets","digest","ellipsis","evaluate","fastmap","graphics","grDevices","grid","htmltools","htmlwidgets","httpuv","jsonlite","knitr","later","lattice","learnr","magrittr","markdown","Matrix","methods","mime","promises","R6","Rcpp","rlang","rmarkdown","rprojroot","shiny","splines","stats","stringi","stringr","survival","tools","utils","withr","xfun","xtable","yaml"]},{"type":"character","attributes":{},"value":["1.1.5","3.6.2","2.0.0","3.6.2","3.6.2","0.6.24","0.3.0","0.14","1.0.1","3.6.2","3.6.2","3.6.2","0.4.0","1.5.1","1.5.2","1.6.1","1.28","1.0.0","0.20-38","0.10.1","1.5","1.1","1.2-18","3.6.2","0.9","1.1.0","2.4.1","1.0.3","0.4.4","2.1","1.3-2","1.4.0","3.6.2","3.6.2","1.4.5","1.4.0","3.1-8","3.6.2","3.6.2","2.1.2","0.12","1.8-4","2.2.1"]}]}]}
+{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["packages"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["packages","version"]},"class":{"type":"character","attributes":{},"value":["data.frame"]},"row.names":{"type":"integer","attributes":{},"value":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43]}},"value":[{"type":"character","attributes":{},"value":["backports","base","checkmate","compiler","datasets","digest","ellipsis","evaluate","fastmap","graphics","grDevices","grid","htmltools","htmlwidgets","httpuv","jsonlite","knitr","later","lattice","learnr","magrittr","markdown","Matrix","methods","mime","promises","R6","Rcpp","rlang","rmarkdown","rprojroot","shiny","splines","stats","stringi","stringr","survival","tools","utils","withr","xfun","xtable","yaml"]},{"type":"character","attributes":{},"value":["1.1.5","3.6.2","2.0.0","3.6.2","3.6.2","0.6.24","0.3.0","0.14","1.0.1","3.6.2","3.6.2","3.6.2","0.4.0","1.5.1","1.5.2","1.6.1","1.28","1.0.0","0.20-38","0.10.1","1.5","1.1","1.2-18","3.6.2","0.9","1.1.0","2.4.1","1.0.3","0.4.4","2.1","1.3-2","1.4.0","3.6.2","3.6.2","1.4.6","1.4.0","3.1-8","3.6.2","3.6.2","2.1.2","0.12","1.8-4","2.2.1"]}]}]}
 </script>
 <!--/html_preserve-->
 </div>

@@ -2,7 +2,7 @@
 title: "Survival - Practical 2: AFT Models"
 output: 
   learnr::tutorial:
-     allow_skip: true
+    allow_skip: true
 runtime: shiny_prerendered
 ---
 
@@ -12,7 +12,7 @@ library("survival")
 library("lattice")
 lung$sex <- factor(lung$sex, labels = c("male", "female"))
 lung <- with(lung, lung[complete.cases(time, status, sex, age, ph.karno), ])
-knitr::opts_chunk$set(echo = FALSE)
+options(tutorial.exercise.timelimit = 1200)
 ```
 
 
@@ -143,7 +143,7 @@ hypothesis into a suitable AFT model. For the error terms assume the extreme val
 distribution, which as we have seen, corresponds to the Weibull distribution for the 
 time-to-death. Name the fitted model `fit1`.
 
-```{r P1, exercise=TRUE, exercise.lines = 10}
+```{r P1, exercise=TRUE, exercise.lines = 15}
 
 ```
 
@@ -301,7 +301,7 @@ fit3 <- survreg(Surv(time, status) ~ sex + age + ph.karno, data = lung)
 ```{r P4-hint-2}
 # The code is (this code just calculates the residuals and does not create any output):
 fits <- fit3$linear.predictors
-resids <- (fit3$y[, 1] - fits) / fit3$scale
+lung$resids <- (log(fit3$y[, 1]) - fits) / fit3$scale
 resKM <- survfit(Surv(resids, status) ~ 1, data = lung)
 ```
 
@@ -312,8 +312,8 @@ resKM <- survfit(Surv(resids, status) ~ 1, data = lung)
 
 ```{r P4-hint-4}
 plot(resKM, mark.time = FALSE, xlab = "AFT Residuals", 
-    ylab = "Survival Probability", main = "AIDS Data Set")
-xx <- seq(min(resids), max(resids), length.out = 35)
+    ylab = "Survival Probability", main = "Lung Data Set")
+xx <- seq(min(lung$resids), max(lung$resids), length.out = 35)
 yy <- exp(- exp(xx))
 lines(xx, yy, col = "red", lwd = 2)
 ```

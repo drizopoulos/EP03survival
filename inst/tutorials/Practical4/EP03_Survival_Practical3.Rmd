@@ -2,7 +2,7 @@
 title: "Survival - Practical 3: Cox PH Models"
 output: 
   learnr::tutorial:
-     allow_skip: true
+    allow_skip: true
 runtime: shiny_prerendered
 ---
 
@@ -12,7 +12,7 @@ library("survival")
 library("lattice")
 library("splines")
 load("Data.RData")
-knitr::opts_chunk$set(echo = FALSE)
+options(tutorial.exercise.timelimit = 1200)
 ```
 
 
@@ -149,7 +149,7 @@ formula argument of `coxph()` use `ns(CD4, 3)`). In addition, include the main e
 `drug` and `AZT`, and the interaction effects of `CD4` with both `drug` and `AZT`. Name 
 the fitted model `fit1`.
 
-```{r P1, exercise=TRUE, exercise.lines = 10}
+```{r P1, exercise=TRUE, exercise.lines = 15}
 
 ```
 

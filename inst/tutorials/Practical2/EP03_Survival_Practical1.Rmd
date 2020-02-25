@@ -2,7 +2,7 @@
 title: "Survival - Practical 1: Features Survival Data, Basic Functions & Tests"
 output: 
   learnr::tutorial:
-     allow_skip: true
+    allow_skip: true
 runtime: shiny_prerendered
 ---
 
@@ -10,7 +10,7 @@ runtime: shiny_prerendered
 library("learnr")
 library("survival")
 load("Data.RData")
-knitr::opts_chunk$set(echo = FALSE)
+options(tutorial.exercise.timelimit = 1200)
 ```
 
 
@@ -122,7 +122,7 @@ separately. Calculate also the estimates of the 50%, 60% and 70% percentiles of 
 survival distribution with their 95% confidence intervals. Name the Breslow estimator 
 object `fitB`.
 
-```{r P2, exercise=TRUE, exercise.lines = 10}
+```{r P2, exercise=TRUE, exercise.lines = 15}
 
 ```
 
@@ -153,7 +153,7 @@ survival probability with its corresponding 95% confidence interval.
 fitB <- survfit(Surv(Time, death) ~ drug, data = aids.id, type = "fleming-harrington")
 ```
 
-```{r P3, exercise=TRUE, exercise.lines = 10}
+```{r P3, exercise=TRUE, exercise.lines = 15}
 
 ```
 
@@ -173,7 +173,7 @@ Compare with the log-rank Peto & Peto modified Gehan-Wilcoxon tests if the survi
 for the two treatment groups differ statistically significantly. **Before** doing the 
 analysis, which of the two tests you expect to yield the smaller p-value and why?
 
-```{r P4, exercise=TRUE, exercise.lines = 10}
+```{r P4, exercise=TRUE, exercise.lines = 15}
 
 ```
 
