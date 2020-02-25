@@ -5,3 +5,7 @@ EP03.Rproj
 *.history
 .gz
 /inst/tutorials/Practical1/*.html
+/inst/tutorials/Practical2/*.html
+/inst/tutorials/Practical3/*.html
+/inst/tutorials/Practical4/*.html
+/inst/tutorials/Practical5/*.html
