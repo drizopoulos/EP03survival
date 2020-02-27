@@ -4,4 +4,3 @@ EP03.Rproj
 *.Rproj.user
 *.history
 .gz
-/inst/tutorials/*/*.html
