@@ -144,7 +144,7 @@ lung <- with(lung, lung[complete.cases(time, status, sex, age, ph.karno), ])
 ### Question 1
 
 Our initial hypothesis is that the time-to-death is affected by `sex`, `age` and`ph.karno`. Also, the physicians believe that the effect of `ph.karno` and `age` may be nonlinear in the log-hazard scale. Moreover, the (possibly nonlinear -- model using natural cubic splines with 3 degrees of freedom) effects of  `age` and `ph.karno` on the log-hazard scale are not the same for males and females. Transform this initial hypothesis
-into a suitable Cox PH model. Name the fitted model `fit1`.
+into a suitable Cox PH model. Name the fitted model `fit_1_full`.
 
 The aim here is to do a realistic analysis of a survival dataset with a Cox PH model. This involves the following steps:
 
